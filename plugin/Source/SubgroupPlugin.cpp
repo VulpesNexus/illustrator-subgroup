@@ -20,6 +20,14 @@
 #include <cstdarg>
 #include <string>
 
+#ifdef WIN_ENV
+/* For the About box only: Windows' task dialog is the one dialog available here
+   that can carry a clickable link. See ShowAboutBox. */
+#include <commctrl.h>
+#include <shellapi.h>
+#pragma comment(lib, "shell32.lib")
+#endif
+
 /* Diagnostic log. A plug-in has no console, and guessing at which step fails is
    slower than writing the answer down.
  *
@@ -366,23 +374,7 @@ ASErr SubgroupPlugin::GoMenuItem(AIMenuMessage* message)
     }
 #endif
     else if (message->menuItem == fAboutPluginMenu) {
-        SDKAboutPluginsHelper helper;
-        helper.PopAboutBox(message, "About Subgroup",
-            "Subgroup " kSubgroupVersionString "\n\n"
-            "Nest Down and Nest Up add a level of grouping inside or around the "
-            "selection, including when it is an entire group - the case Object > "
-            "Group declines.\n\n"
-            "Align Group To Selected aligns a group's contents to one selected "
-            "child, which Illustrator's own Align cannot reach.\n\n"
-            "Assign Ctrl+G to Nest Down in Edit > Keyboard Shortcuts.\n\n"
-            /* The GPL asks an interactive program to show this where the user
-               can find it, which for a plug-in with no window of its own means
-               the About box. */
-            "Copyright (C) 2026 Vixen420. Subgroup is free software under the "
-            "GNU General Public License, version 3 or later, with an Adobe "
-            "Illustrator SDK linking exception. It comes with ABSOLUTELY NO "
-            "WARRANTY. See LICENSE and LICENSE-EXCEPTION, or "
-            "<https://www.gnu.org/licenses/>.");
+        ShowAboutBox();
     }
     return kNoErr;
 }
@@ -435,7 +427,7 @@ ASErr SubgroupPlugin::UpdateMenuItem(AIMenuMessage* message)
 }
 /* -------------------------------------------------------------- notifiers -- */
 
-ASErr SubgroupPlugin::Notify(AINotifierMessage* message)
+ASErr SubgroupPlugin::Notify(AINotifierMessage* /*message*/)
 {
     return kNoErr;
 }
@@ -658,6 +650,122 @@ void SubgroupPlugin::SettleDisclosure(AIArtHandle newGroup) const
         if (sAIArt->GetArtParent(a, &parent) != kNoErr) break;
         a = parent;
     }
+}
+
+/* ------------------------------------------------------------------ about -- */
+
+/* Deliberately not SDKAboutPluginsHelper::PopAboutBox.
+ *
+ * That helper takes a char* and builds an ai::UnicodeString from it using the
+ * default encoding, which is the *platform* one - so on a machine whose code
+ * page is not Latin-1, an em dash or a copyright sign arrives as mojibake.
+ * Everything below is UTF-16, written as escapes so the source file stays plain
+ * ASCII and no compiler has to guess at its encoding.
+ *
+ * The helper also ends in AIUserSuite::MessageAlert, a plain OS alert. It has
+ * no styled runs at all, so italicizing command names is not on offer in it -
+ * nor in the task dialog below, whose markup is limited to links. Command names
+ * are given their own lines instead, which is the legibility lever that does
+ * exist.
+ *
+ * The task dialog is resolved at run time rather than linked. TaskDialogIndirect
+ * lives in version 6 of comctl32, and whether a host process has that in its
+ * activation context is the host's business, not ours. Missing, GetProcAddress
+ * returns null and we fall back to MessageAlert with the same words and the
+ * links spelled out - which is all the old code ever did.
+ */
+
+/* One version number, two literal flavors. The two-step expansion is what makes
+   the argument expand before L is pasted onto it. */
+#define SG_WIDEN2(x) L ## x
+#define SG_WIDEN(x)  SG_WIDEN2(x)
+#define SG_WVERSION  SG_WIDEN(kSubgroupVersionString)
+
+/* U+2014 em dash, U+2192 rightwards arrow, U+00A9 copyright sign. */
+#define SG_EMDASH   L"\x2014"
+#define SG_ARROW    L"\x2192"
+#define SG_COPY     L"\x00A9"
+
+#define SG_REPO_URL     L"https://github.com/VulpesNexus/illustrator-subgroup"
+#define SG_AUTHOR_URL   L"https://github.com/VulpesNexus"
+
+#define SG_ABOUT_BODY                                                          \
+    L"Nest Down\n"                                                             \
+    L"adds a level of grouping inside the selection, including when the "      \
+    L"selection is an entire group " SG_EMDASH L" the case Object "            \
+    SG_ARROW L" Group declines.\n\n"                                           \
+    L"Nest Up\n"                                                               \
+    L"adds that level around the selection instead.\n\n"                       \
+    L"Align Group To Selected\n"                                               \
+    L"aligns a group's contents to one object selected inside it, which "      \
+    L"Illustrator's own Align cannot reach."
+
+#define SG_ABOUT_LEGAL_TEXT                                                    \
+    L"Copyright " SG_COPY L" 2026 Vixen420. Free software under the GNU "      \
+    L"General Public License, version 3 or later, with an Adobe Illustrator "  \
+    L"SDK linking exception. It comes with ABSOLUTELY NO WARRANTY."
+
+#ifdef WIN_ENV
+static HRESULT CALLBACK SGAboutCallback(HWND, UINT msg, WPARAM, LPARAM lParam, LONG_PTR)
+{
+    if (msg == TDN_HYPERLINK_CLICKED && lParam != 0)
+        ShellExecuteW(nullptr, L"open", reinterpret_cast<LPCWSTR>(lParam),
+                      nullptr, nullptr, SW_SHOWNORMAL);
+    return S_OK;
+}
+
+/* True if the task dialog was shown. False means fall back. */
+static bool SGAboutTaskDialog()
+{
+    typedef HRESULT (WINAPI *TaskDialogIndirectFn)(const TASKDIALOGCONFIG*, int*, int*, BOOL*);
+
+    HMODULE comctl = LoadLibraryW(L"comctl32.dll");
+    if (comctl == nullptr) return false;
+
+    TaskDialogIndirectFn fn = reinterpret_cast<TaskDialogIndirectFn>(
+        reinterpret_cast<void*>(GetProcAddress(comctl, "TaskDialogIndirect")));
+    if (fn == nullptr) { FreeLibrary(comctl); return false; }
+
+    TASKDIALOGCONFIG cfg = { 0 };
+    cfg.cbSize             = sizeof(cfg);
+    cfg.hwndParent         = GetActiveWindow();
+    cfg.dwFlags            = TDF_ENABLE_HYPERLINKS | TDF_ALLOW_DIALOG_CANCELLATION;
+    cfg.dwCommonButtons    = TDCBF_OK_BUTTON;
+    cfg.pszWindowTitle     = L"About Subgroup";
+    cfg.pszMainInstruction = L"Subgroup " SG_WVERSION;
+    cfg.pszContent         = SG_ABOUT_BODY
+                             L"\n\n<a href=\"" SG_REPO_URL L"\">"
+                             L"github.com/VulpesNexus/illustrator-subgroup</a>";
+    /* The GPL asks an interactive program to show this where the user can find
+       it. For a plug-in with no window of its own, that is here. */
+    cfg.pszFooter          = L"Copyright " SG_COPY L" 2026 <a href=\"" SG_AUTHOR_URL
+                             L"\">Vixen420</a>. Free software under the GNU General "
+                             L"Public License, version 3 or later, with an Adobe "
+                             L"Illustrator SDK linking exception. It comes with "
+                             L"ABSOLUTELY NO WARRANTY.";
+    cfg.pfCallback         = SGAboutCallback;
+
+    HRESULT hr = fn(&cfg, nullptr, nullptr, nullptr);
+    FreeLibrary(comctl);
+    return SUCCEEDED(hr);
+}
+#endif /* WIN_ENV */
+
+void SubgroupPlugin::ShowAboutBox()
+{
+#ifdef WIN_ENV
+    if (SGAboutTaskDialog()) return;
+#endif
+    if (sAIUser == nullptr) return;
+
+    /* No link markup here: MessageAlert would show the tags literally. */
+    const wchar_t* text =
+        L"Subgroup " SG_WVERSION L"\n\n"
+        SG_ABOUT_BODY L"\n\n"
+        SG_REPO_URL L"\n\n"
+        SG_ABOUT_LEGAL_TEXT;
+
+    sAIUser->MessageAlert(ai::UnicodeString(reinterpret_cast<const ASUnicode*>(text)));
 }
 
 /* --------------------------------------------------- in-group alignment -- */

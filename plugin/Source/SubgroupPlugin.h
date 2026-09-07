@@ -120,6 +120,12 @@ private:
     /** Adds a level above the selection, including around a lone group. */
     ASErr DoWrap();
 
+    /** The About box, carrying the license notice the GPL asks an interactive
+        program to show. Windows' task dialog where it is available, since it is
+        the only dialog reachable from here that can hold a clickable link;
+        AIUserSuite::MessageAlert otherwise. */
+    static void ShowAboutBox();
+
 
     AIBoolean IsAlignItem(AIMenuItemHandle item) const;
 

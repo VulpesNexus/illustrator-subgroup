@@ -24,6 +24,7 @@
 #include "AITransformArt.h"
 #include "AINotifier.h"
 #include "AIPreference.h"
+#include "AIUser.h"
 
 extern "C" SPBlocksSuite*           sSPBlocks;
 extern "C" AIArtSuite*              sAIArt;
@@ -33,9 +34,10 @@ extern "C" AIMenuSuite*             sAIMenu;
 extern "C" AIPreferenceSuite*       sAIPreference;
 extern "C" AITransformArtSuite*     sAITransformArt;
 
-/* sAINotifier is declared and imported by the SDK's common framework
-   (samplecode/common/source/Suites.cpp). Redeclaring it here would be a
-   duplicate definition at link time, so we just use theirs via Suites.hpp. */
+/* sAINotifier and sAIUser are declared and imported by the SDK's common
+   framework (samplecode/common/source/Suites.cpp). Redeclaring either here is a
+   duplicate definition at link time, so we use theirs via Suites.hpp. AIUser.h
+   is still included above, for the suite's own declarations. */
 extern "C" AIUnicodeStringSuite*    sAIUnicodeString;
 
 #endif /* __SUBGROUPSUITES_H__ */

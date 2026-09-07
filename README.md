@@ -201,10 +201,11 @@ level *inside* that group holding everything the group currently contains.
 Anywhere else it groups the selection exactly as Illustrator would, reproducing
 native placement rather than imitating it.
 
-Assign `Ctrl+G` to it in **Edit → Keyboard Shortcuts… → Menu Commands → Object →
-Subgroup → Nest Down** and grouping simply starts working where Illustrator
-declines. Nothing else changes. The plug-in deliberately does not claim the
-shortcut for you; see [The shortcut has to be assigned by
+Every command here is assignable under **Edit → Keyboard Shortcuts… → Menu
+Commands → Object → Subgroup**, like any other menu command. Nest Down is the
+one worth a key: give it `Ctrl+G` and grouping simply starts working where
+Illustrator declines, with nothing else changed. The plug-in deliberately does
+not claim any shortcut for you — see [The shortcut has to be assigned by
 hand](#the-shortcut-has-to-be-assigned-by-hand).
 
 ### Nest Up
@@ -387,6 +388,15 @@ discriminator is `kArtFullySelected`.
 it on every one, so a one-shot `SetKeyArt` never reaches the moment the user
 opens Align. This is invisible to a scripted test, because setting
 `app.selection` from the DOM does not cancel key art the way clicking does.
+
+**`SDKAboutPluginsHelper::PopAboutBox` cannot carry non-ASCII text.** It takes a
+`char*` and builds an `ai::UnicodeString` from it with the default encoding,
+which is the *platform* one — so an em dash or a copyright sign becomes mojibake
+on any machine whose code page is not Latin-1, and the author never sees it
+because their own machine usually is. Build the string as UTF-16 and call
+`AIUserSuite::MessageAlert` directly. Note also that `MessageAlert` is a plain OS
+alert: no styled runs, so no italics, no links. Windows' task dialog gives links
+and a bold heading, but still no italics anywhere.
 
 **DOM-driven verification does not reproduce hand gestures**, and this is the
 methodological lesson of the whole project. `executeMenuCommand` is not

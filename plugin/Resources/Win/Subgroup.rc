@@ -68,7 +68,11 @@ BEGIN
             VALUE "FileDescription",  "Subgroup plug-in for Adobe Illustrator", "\0"
             VALUE "FileVersion",      kSubgroupVersionString, "\0"
             VALUE "InternalName",     kMySDKPluginName, "\0"
-            VALUE "LegalCopyright",   "Copyright (C) 2026 Vixen420. GPL-3.0-or-later, with an Adobe Illustrator SDK linking exception.", "\0"
+            // \251 is the copyright sign at its code page 1252 position. Written
+            // as an escape so this file stays plain ASCII and its encoding can
+            // never be misread; a literal glyph here would depend on the source
+            // file and the #pragma above agreeing.
+            VALUE "LegalCopyright",   "Copyright \251 2026 Vixen420. GPL-3.0-or-later, with an Adobe Illustrator SDK linking exception.", "\0"
             VALUE "OriginalFilename", kMySDKPluginName ".aip", "\0"
             VALUE "ProductName",      "Subgroup", "\0"
             VALUE "ProductVersion",   kSubgroupVersionString, "\0"
