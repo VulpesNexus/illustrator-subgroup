@@ -9,7 +9,7 @@
 //
 // Additional permission under GPL-3.0 section 7: this file may be combined with
 // the Adobe Illustrator SDK, whose sample framework sources are compiled into
-// every plug-in built from it. See LICENSE-EXCEPTION.
+// every plugin built from it. See LICENSE-EXCEPTION.
 
 /* The About dialog.
  *
@@ -213,7 +213,7 @@ INT_PTR CALLBACK AboutProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
             L"Vibecoded by <a href=\"" SG_AUTHOR_URL L"\">Vixen420</a> in September 2026.");
 
         /* The GPL asks an interactive program to show this where the user can
-           find it. For a plug-in with no window of its own, that is here. */
+           find it. For a plugin with no window of its own, that is here. */
         SetDlgItemTextW(dlg, IDC_ABOUT_LEGAL,
             L"Copyright " SG_COPY L" 2026 Vixen420. "
             L"Free software under the GNU General Public License, version 3 or "

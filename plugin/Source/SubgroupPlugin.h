@@ -9,7 +9,7 @@
 //
 // Additional permission under GPL-3.0 section 7: this file may be combined with
 // the Adobe Illustrator SDK, whose sample framework sources are compiled into
-// every plug-in built from it. See LICENSE-EXCEPTION.
+// every plugin built from it. See LICENSE-EXCEPTION.
 
 #ifndef __SUBGROUPPLUGIN_H__
 #define __SUBGROUPPLUGIN_H__
@@ -32,9 +32,9 @@ void FixupReload(Plugin* plugin);
     Illustrator does not dispatch that command at all when the selection is
     already a single group: measured at the keyboard, neither the pre- nor the
     post-command notifier fires, so there is nothing to listen to in exactly the
-    case this plug-in exists for.
+    case this plugin exists for.
 
-    The shortcut is left to the user's keyboard set. The plug-in deliberately
+    The shortcut is left to the user's keyboard set. The plugin deliberately
     does not call SetItemCmd - see AddMenus for why that is worse than useless.
 */
 class SubgroupPlugin : public Plugin

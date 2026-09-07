@@ -7,7 +7,7 @@
 // version. It comes with ABSOLUTELY NO WARRANTY. See the file LICENSE, or
 // <https://www.gnu.org/licenses/>, for the full text.
 
-/* Shows the plug-in's About dialog on its own, outside Illustrator.
+/* Shows the plugin's About dialog on its own, outside Illustrator.
  *
  * A modal dialog inside a host application is close to untestable: you cannot
  * drive it, screenshot it, or measure it without a person sitting there. This
@@ -16,7 +16,7 @@
  * again after every edit.
  *
  * Build it with tools/AboutHarness/build.cmd. It is a development tool and is
- * not part of the plug-in.
+ * not part of the plugin.
  */
 
 #include <windows.h>

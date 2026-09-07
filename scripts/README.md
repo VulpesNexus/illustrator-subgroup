@@ -1,7 +1,7 @@
 # Subgroup — the ExtendScript version
 
 The no-SDK fallback, and the only route if you would rather not build anything.
-These *do* rebind *Ctrl+G*; [the plug-in](../README.md) avoids that.
+These *do* rebind *Ctrl+G*; [the plugin](../README.md) avoids that.
 
 Two commands and a settings dialog, sharing one persistent store.
 
@@ -70,5 +70,5 @@ Binding *Ctrl+G* is safe because the script's first action is to call the very
 command it just took the shortcut from — but it is a global reassignment rather
 than a hook. If the folder is moved or deleted without clearing the shortcut,
 *Ctrl+G* stops working until you restore it. That is the honest cost of the
-scripting route, and the reason the plug-in exists.
+scripting route, and the reason the plugin exists.
 

@@ -22,7 +22,7 @@ already a single group. Measured by hand at the keyboard: grouping two loose
 rectangles fires `Before Group` and `After Group` normally, and pressing
 *Ctrl+G* again on the resulting group fires **nothing**. The command is
 short-circuited before it runs, so there is no notifier in exactly the case this
-plug-in exists to handle.
+plugin exists to handle.
 
 This is easy to miss, because `executeMenuCommand("group")` *does* fire both
 notifiers — it force-dispatches and bypasses the enablement check. A scripted
@@ -34,13 +34,13 @@ the diagnostic build can log whether the native command ran.
 
 `AIMenuSuite::SetItemCmd` is not a way out. Calling `SetItemCmd(item, 'g', 0)`
 returns `kNoErr` and `GetItemCmd` reads the value back correctly, but
-Illustrator does not honor a plug-in's claim over a shortcut an existing
+Illustrator does not honor a plugin's claim over a shortcut an existing
 built-in owns: *Ctrl+G* still reaches Object > Group. It reports success and
 silently declines.
 
 Worse, it re-asserts that conflicting binding at every launch, quietly editing
 the user's saved keyboard set. The call is deliberately absent from this
-plug-in and should stay absent.
+plugin and should stay absent.
 
 *.kys* files are plain PostScript-style text, so a keyboard set can be inspected
 directly: `/Menus { /<command name> { /Context /Modifiers /Represent /Key } }`,
@@ -48,15 +48,15 @@ where Modifiers 64 is Ctrl and Key 71 is *G*. This is also why
 `kSubgroupGroupCmd` must never be renamed — it is the key the assignment is
 stored under, and changing it silently orphans the user's *Ctrl+G*.
 
-### A plug-in cannot add items to a native submenu's group
+### A plugin cannot add items to a native submenu's group
 
 `AddMenuGroup` anchored near `kAlignObjectMenuGroup` returns `kNoErr`, and then
 adding items to that group fails with `kBadParameterErr` (1346458189 =
 `0x5041524D` = `'PARM'`). The group is created and is useless. The align
-commands live in the plug-in's own submenu for this reason.
+commands live in the plugin's own submenu for this reason.
 
 The related trap: an early `return` on that failure cost every *later* menu item
-and both notifiers, silently disabling the whole plug-in. Notifiers are now
+and both notifiers, silently disabling the whole plugin. Notifiers are now
 registered first, and optional menu placement cannot take the core down with it.
 
 ### Menu items lay out in insertion order
@@ -85,7 +85,7 @@ either, or every real top-level object looks nested.
 
 **"Did the command act?" cannot be answered by first-child identity.** Grouping
 a subset puts the new group at the topmost selected index, which is often not
-zero, so the first child is unchanged and a plug-in wrongly concludes the
+zero, so the first child is unchanged and a plugin wrongly concludes the
 command declined — adding a spurious level to ordinary grouping. The
 discriminator is `kArtFullySelected`.
 
@@ -151,6 +151,6 @@ AboutHarness.exe                 show the dialog
 AboutHarness.exe /exit3000       show it, then close after three seconds
 ```
 
-The harness `#include`s the plug-in's dialog template rather than copying it. A
+The harness `#include`s the plugin's dialog template rather than copying it. A
 copy would stop being evidence about what ships.
 

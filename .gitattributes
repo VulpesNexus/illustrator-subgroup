@@ -1,6 +1,6 @@
 # core.autocrlf is commonly on for Windows checkouts. Say explicitly what is
 # text and what is not, so a clone can never line-ending-mangle the shipped
-# binary — that failure is silent and produces a plug-in Illustrator refuses
+# binary — that failure is silent and produces a plugin Illustrator refuses
 # to load.
 
 *               text=auto

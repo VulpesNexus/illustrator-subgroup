@@ -9,7 +9,7 @@
 //
 // Additional permission under GPL-3.0 section 7: this file may be combined with
 // the Adobe Illustrator SDK, whose sample framework sources are compiled into
-// every plug-in built from it. See LICENSE-EXCEPTION.
+// every plugin built from it. See LICENSE-EXCEPTION.
 
 #ifndef __SUBGROUPID_H__
 #define __SUBGROUPID_H__
@@ -19,8 +19,8 @@
 /* One place for the version. Subgroup.rc builds the Windows VERSIONINFO
    resource out of both of these, and the About box shows the string. Keep them
    in step with the VERSION file at the root of the repository. */
-#define kSubgroupVersionCommas      1,0,0,0
-#define kSubgroupVersionString      "1.0.0"
+#define kSubgroupVersionCommas      1,0,1,0
+#define kSubgroupVersionString      "1.0.1"
 
 /* Wide flavors of the same text, for the Windows dialogs. The two-step
    expansion is what makes the argument expand before L is pasted onto it.
@@ -90,7 +90,7 @@
  * IS selecting the group - one object, so Align shifts the group against the
  * artboard instead of arranging what is inside it.
  *
- * So the plug-in offers exactly that: select ONE object inside a group, and its
+ * So the plugin offers exactly that: select ONE object inside a group, and its
  * siblings move to meet it. The selection already says which object should hold
  * still, so there is no anchor to name and nothing to remember.
  *

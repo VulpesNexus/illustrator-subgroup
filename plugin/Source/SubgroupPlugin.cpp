@@ -9,7 +9,7 @@
 //
 // Additional permission under GPL-3.0 section 7: this file may be combined with
 // the Adobe Illustrator SDK, whose sample framework sources are compiled into
-// every plug-in built from it. See LICENSE-EXCEPTION.
+// every plugin built from it. See LICENSE-EXCEPTION.
 
 #include "IllustratorSDK.h"
 #include "SubgroupPlugin.h"
@@ -26,7 +26,7 @@
 #include "SubgroupAbout.h"
 #endif
 
-/* Diagnostic log. A plug-in has no console, and guessing at which step fails is
+/* Diagnostic log. A plugin has no console, and guessing at which step fails is
    slower than writing the answer down.
  *
  * Off unless switched on from Object > Subgroup, so a normal install writes
@@ -160,13 +160,13 @@ ASErr SubgroupPlugin::AddNotifiers(SPInterfaceMessage* message)
     return error;
 }
 
-/* Every step is logged and, past the point where the plug-in is usable,
+/* Every step is logged and, past the point where the plugin is usable,
    nothing is fatal.
 
    An earlier version returned on the first error. When AddMenuGroup could not
-   find "Align Objects" - AIMenu.h warns that plug-in load order is
+   find "Align Objects" - AIMenu.h warns that plugin load order is
    indeterminate - that single failure cost every later menu item AND both
-   notifiers, silently disabling the whole plug-in. The core commands are now
+   notifiers, silently disabling the whole plugin. The core commands are now
    built first, and the optional placement cannot take them down with it. */
 ASErr SubgroupPlugin::AddMenus(SPInterfaceMessage* message)
 {

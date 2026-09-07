@@ -8,7 +8,7 @@ Everything here was measured by driving the running application over its COM
 bridge and reading the resulting object tree back, rather than taken from
 documentation. Reproducing it needs only `New-Object -ComObject
 Illustrator.Application` and `DoJavaScript`. Where a measurement says "by
-hand", a person performed the gesture at the keyboard while the plug-in
+hand", a person performed the gesture at the keyboard while the plugin
 logged the resulting state; those are the ones that matter, for the reason
 given in [the implementation notes](implementation-notes.md).
 
@@ -91,7 +91,7 @@ it has no scripting surface whatsoever: reflecting over `PathItem`, `GroupItem`,
 read which gesture was used.
 
 `kArtTargeted` *is* readable from C++, which is the obvious next hope, and it is
-also a dead end. Measured with the plug-in reading the attribute bits directly:
+also a dead end. Measured with the plugin reading the attribute bits directly:
 
 ```
 click the artwork      -> PAIR sel=1 full=1 TARGETED=1    targeted set = {PAIR}
@@ -163,7 +163,7 @@ still applies afterward.** After nesting `Group(A, B)` into `Group(Group(A, B))`
 clicking the art still resolves to the outer group. The new level is real and
 addressable in the Layers panel, but it did not create a new selection state,
 because nothing can — the rule lives in the selection model, upstream of the
-commands, and not even the Layers panel's target column escapes it. This plug-in
+commands, and not even the Layers panel's target column escapes it. This plugin
 changes structure; it does not change what a click means.
 
 The other consequence is the one Adobe's guard was protecting against: nesting

@@ -8,10 +8,10 @@ Copyright (C) 2026 Vixen420
 Why this is here
 ----------------
 
-An Illustrator plug-in cannot be built without the Adobe Illustrator SDK, and
-the resulting binary is not merely linked against it. Adobe ships the plug-in
+An Illustrator plugin cannot be built without the Adobe Illustrator SDK, and
+the resulting binary is not merely linked against it. Adobe ships the plugin
 entry point, the message dispatch loop, and the suite acquisition as *source*,
-in samplecode/common/, and every plug-in compiles that source into itself. In a
+in samplecode/common/, and every plugin compiles that source into itself. In a
 release build of Subgroup, seven of the nine object files are Adobe's:
 
     Main.obj  Plugin.obj  Suites.obj  AppContext.obj  IllustratorSDK.obj
@@ -25,7 +25,7 @@ which no one but Adobe is in a position to do for Adobe's code.
 
 So the source in this repository is unambiguously GPL — it contains no Adobe
 code, and the SDK is referenced by path rather than vendored. The *compiled
-plug-in* would not be distributable under a bare GPL, because the license it
+plugin* would not be distributable under a bare GPL, because the license it
 purported to grant would cover code the copyright holder has no authority to
 relicense. Section 7 exists for exactly this situation, and this file uses it.
 

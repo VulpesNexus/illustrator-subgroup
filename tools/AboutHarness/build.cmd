@@ -2,7 +2,7 @@
 rem SPDX-License-Identifier: GPL-3.0-or-later
 rem Copyright (C) 2026 Vixen420
 rem
-rem Builds the About-dialog harness. Development tool; not part of the plug-in.
+rem Builds the About-dialog harness. Development tool; not part of the plugin.
 rem Needs a Visual Studio command prompt, or run it through vcvars64.bat.
 rem
 rem   build.cmd            build it

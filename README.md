@@ -1,6 +1,6 @@
 # Subgroup
 
-An Adobe Illustrator plug-in for two things Illustrator refuses to do:
+An Adobe Illustrator plugin for two things Illustrator refuses to do:
 
 - **nest a group inside itself** — *Ctrl+G* does nothing when the selection is
   already a whole group, which is why subgrouping "needs a third object";
@@ -18,7 +18,7 @@ No admin rights; deleting the *.aip* uninstalls it.
 Prebuilt binary: [*install/*](install), or the
 [latest release](../../releases/latest).
 
-Replacing the file needs Illustrator fully closed — it holds the plug-in open
+Replacing the file needs Illustrator fully closed — it holds the plugin open
 while running.
 
 ## Use
@@ -50,7 +50,7 @@ grouping starts working where Illustrator declines, with nothing else changed.
 Illustrator will warn that *Ctrl+G* belongs to *Object > Group*; accepting is
 safe, and clearing the assignment restores stock behavior completely.
 
-The plug-in never touches your keyboard set itself —
+The plugin never touches your keyboard set itself —
 [it cannot, safely](docs/implementation-notes.md#the-shortcut-has-to-be-assigned-by-hand).
 
 ## Build
@@ -65,7 +65,7 @@ message.
 msbuild plugin\Subgroup.vcxproj /p:Configuration=Release /p:Platform=x64 /p:AISDK="<path to SDK>"
 ```
 
-The SDK is version-gated per suite, so a CS6 SDK cannot produce a plug-in that
+The SDK is version-gated per suite, so a CS6 SDK cannot produce a plugin that
 loads into 30.7 — the v30 SDK from the Adobe Developer Console is required.
 
 *tools\AboutHarness\build.cmd* builds the About dialog as a standalone
@@ -87,7 +87,7 @@ executable, which is the only way to look at it outside Illustrator.
 ## Also here
 
 - [*scripts/*](scripts) — an ExtendScript version, for anyone without the SDK.
-  It does rebind *Ctrl+G*, which the plug-in avoids.
+  It does rebind *Ctrl+G*, which the plugin avoids.
 - [Why Illustrator declines](docs/why-illustrator-declines.md) — what the
   restriction actually is, measured rather than guessed, and whether working
   around it costs anything.

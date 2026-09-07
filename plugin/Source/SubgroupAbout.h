@@ -9,7 +9,7 @@
 //
 // Additional permission under GPL-3.0 section 7: this file may be combined with
 // the Adobe Illustrator SDK, whose sample framework sources are compiled into
-// every plug-in built from it. See LICENSE-EXCEPTION.
+// every plugin built from it. See LICENSE-EXCEPTION.
 
 #ifndef __SUBGROUPABOUT_H__
 #define __SUBGROUPABOUT_H__

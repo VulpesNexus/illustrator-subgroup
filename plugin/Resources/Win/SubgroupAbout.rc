@@ -9,9 +9,9 @@
 //
 // Additional permission under GPL-3.0 section 7: this file may be combined with
 // the Adobe Illustrator SDK, whose sample framework sources are compiled into
-// every plug-in built from it. See LICENSE-EXCEPTION.
+// every plugin built from it. See LICENSE-EXCEPTION.
 
-// The About dialog, kept in a file of its own so the plug-in's resource script
+// The About dialog, kept in a file of its own so the plugin's resource script
 // and tools/AboutHarness can compile the same template. If they diverged, the
 // harness would stop being evidence about the shipped dialog.
 //

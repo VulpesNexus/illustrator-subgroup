@@ -9,7 +9,7 @@
 //
 // Additional permission under GPL-3.0 section 7: this file may be combined with
 // the Adobe Illustrator SDK, whose sample framework sources are compiled into
-// every plug-in built from it. See LICENSE-EXCEPTION.
+// every plugin built from it. See LICENSE-EXCEPTION.
 
 #include "resource.h"
 
@@ -17,7 +17,7 @@
 #include "SubgroupID.h"
 /* winres.h rather than the sample's afxres.h: afxres.h ships with MFC, which a
    default Visual Studio C++ install does not include. winres.h is part of the
-   Windows SDK and provides everything a plug-in resource script needs. */
+   Windows SDK and provides everything a plugin resource script needs. */
 #include "winres.h"
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -37,7 +37,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // VersionInfo.rc. That file hard-codes CompanyName, ProductName, and
 // LegalCopyright to Adobe's, with no way to override them, so every sample
 // built from it ships claiming Adobe published it. Fine for a sample that
-// never leaves the SDK tree; not fine for a plug-in anyone else installs.
+// never leaves the SDK tree; not fine for a plugin anyone else installs.
 //
 // Put your own name in LegalCopyright and CompanyName if you fork this.
 //
@@ -65,7 +65,7 @@ BEGIN
         BLOCK "040904E4" // Lang=US English, CharSet=Windows Multilingual
         BEGIN
             VALUE "CompanyName",      "Subgroup", "\0"
-            VALUE "FileDescription",  "Subgroup plug-in for Adobe Illustrator", "\0"
+            VALUE "FileDescription",  "Subgroup plugin for Adobe Illustrator", "\0"
             VALUE "FileVersion",      kSubgroupVersionString, "\0"
             VALUE "InternalName",     kMySDKPluginName, "\0"
             // \251 is the copyright sign at its code page 1252 position. Written
