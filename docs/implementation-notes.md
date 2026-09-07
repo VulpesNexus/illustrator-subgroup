@@ -14,10 +14,10 @@ For what the underlying restriction actually is, see
 ### The command notifiers cannot carry this feature
 
 The first design listened to `kAIGroupCommandPreNotifierStr` /
-`…PostNotifierStr` around Object > Group, on the theory that *Ctrl+G* need never
+`…PostNotifierStr` around *Object > Group*, on the theory that *Ctrl+G* need never
 be rebound. **That does not work.**
 
-Illustrator does not dispatch Object > Group *at all* when the selection is
+Illustrator does not dispatch *Object > Group* **at all** when the selection is
 already a single group. Measured by hand at the keyboard: grouping two loose
 rectangles fires `Before Group` and `After Group` normally, and pressing
 *Ctrl+G* again on the resulting group fires **nothing**. The command is
@@ -35,7 +35,7 @@ the diagnostic build can log whether the native command ran.
 `AIMenuSuite::SetItemCmd` is not a way out. Calling `SetItemCmd(item, 'g', 0)`
 returns `kNoErr` and `GetItemCmd` reads the value back correctly, but
 Illustrator does not honor a plugin's claim over a shortcut an existing
-built-in owns: *Ctrl+G* still reaches Object > Group. It reports success and
+built-in owns: *Ctrl+G* still reaches *Object > Group*. It reports success and
 silently declines.
 
 Worse, it re-asserts that conflicting binding at every launch, quietly editing
@@ -44,7 +44,7 @@ plugin and should stay absent.
 
 *.kys* files are plain PostScript-style text, so a keyboard set can be inspected
 directly: `/Menus { /<command name> { /Context /Modifiers /Represent /Key } }`,
-where Modifiers 64 is Ctrl and Key 71 is *G*. This is also why
+where Modifiers 64 is *Ctrl* and Key 71 is *G*. This is also why
 `kSubgroupGroupCmd` must never be renamed — it is the key the assignment is
 stored under, and changing it silently orphans the user's *Ctrl+G*.
 
@@ -95,7 +95,7 @@ discriminator is `kArtFullySelected`.
 
 **Key art does not survive a hand-made selection change.** Illustrator cancels
 it on every one, so a one-shot `SetKeyArt` never reaches the moment the user
-opens Align. This is invisible to a scripted test, because setting
+opens *Align*. This is invisible to a scripted test, because setting
 `app.selection` from the DOM does not cancel key art the way clicking does.
 
 **`SDKAboutPluginsHelper::PopAboutBox` cannot carry non-ASCII text.** It takes a
