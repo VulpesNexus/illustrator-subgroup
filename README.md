@@ -31,7 +31,7 @@ Everything is under *Object > Subgroup*.
 | **Nest Up** | Adds that level *around* the selection instead. Same shape, different group object left outermost — which matters if the original carries an appearance. |
 | **Align Group To Selected** | Select **one object inside a group**; its siblings move to meet it. Seven alignments, with combined-center between the horizontal and vertical triples. |
 | **Nest Whole Groups** | Off, *Nest Down* declines a whole-group selection exactly as Illustrator does. On by default. |
-| **Keep New Groups Open** | Leaves a new group expanded in the Layers panel. Off by default, matching vanilla. |
+| **Keep New Groups Open** | Leaves a new group expanded in the *Layers* panel. Off by default, matching vanilla. |
 
 Commands gray out when they do not apply. *Align Group To Selected* needs
 exactly one child of one group selected — a whole group singles out nothing, and
