@@ -413,17 +413,28 @@ which is the *platform* one — so an em dash or a copyright sign becomes mojiba
 on any machine whose code page is not Latin-1, and the author never sees it
 because their own machine usually is.
 
-It also ends in `AIUserSuite::MessageAlert`, a plain OS alert: one run of
-unstyled text, no emphasis, no links. Windows' task dialog can hold links, but
-only in its content and footer — its main instruction, the one piece of text
-with any visual weight, cannot be one, and nothing in it can be emphasized.
-Neither offers italics at all. So the About box here is an ordinary dialog
-resource with `SysLink` controls where a link is wanted and a bold font where
-weight is wanted, and its strings are UTF-16 with the non-ASCII characters
-written as escapes, so no compiler has to guess at a source file's encoding.
+**Nothing Illustrator or Windows hands you will style a word mid-sentence.**
+Three dialogs were tried before the current one:
 
-Command names are bold rather than underlined on purpose: underline reads as
-*clickable* to anyone who has used a computer, and these are not.
+- `MessageAlert`, which `PopAboutBox` ends in, is a plain OS alert — one run of
+  unstyled text, no emphasis, no links.
+- Windows' **task dialog** looks the part and holds links, but only in its
+  content and footer: the main instruction, the one piece of text with any
+  visual weight, cannot be one. Its markup is links and nothing else.
+- A dialog of **static controls** gets bold, because a static can be given a
+  bold font. It cannot get italics *inside a sentence*, because a static has
+  exactly one font.
+
+So the prose lives in a **rich edit control**, the one common control that can
+change font mid-sentence, fed RTF. Command names are bold where they head a
+paragraph and italic where they are mentioned inside one. Links are `SysLink`
+controls. The two-band background — white above, button face below, divided by
+a rule — is the task dialog's own layout, reproduced by hand; that appearance
+never depended on the task dialog.
+
+`Msftedit.dll` must be loaded before the dialog is created, since that is what
+registers the `RICHEDIT50W` class the template names. Without it the control
+silently fails to create and the dialog comes up with a hole in it.
 
 **DOM-driven verification does not reproduce hand gestures**, and this is the
 methodological lesson of the whole project. `executeMenuCommand` is not

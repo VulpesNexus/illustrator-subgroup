@@ -13,28 +13,37 @@
 
 /* The About dialog.
  *
- * Built by hand rather than through the SDK's SDKAboutPluginsHelper, and rather
- * than through Windows' task dialog, because both refuse the two things this
- * box is supposed to do.
+ * Three dialogs were tried before this one, and each was abandoned for a
+ * concrete reason worth recording, because the reasons are not obvious and the
+ * temptation to go back to the simpler thing is real.
  *
- *   - AIUserSuite::MessageAlert, which the SDK helper ends in, is a plain OS
- *     alert: one run of text, no emphasis, no links. It also takes a char* and
- *     decodes it in the *platform* encoding, so an em dash or a copyright sign
- *     turns to mojibake anywhere the code page is not Latin-1.
- *   - The task dialog can hold links, but only in its content and footer. Its
- *     main instruction - the one piece of text with any visual weight - cannot
- *     be one, and nothing in it can be emphasized.
+ *   AIUserSuite::MessageAlert, which SDKAboutPluginsHelper::PopAboutBox ends in,
+ *   is a plain OS alert: one run of unstyled text, no emphasis, no links. It
+ *   also takes a char* and decodes it in the *platform* encoding, so an em dash
+ *   or a copyright sign turns to mojibake anywhere the code page is not
+ *   Latin-1 - which is how a bug got within one restart of shipping.
  *
- * So: a dialog resource with SysLink controls where a link is wanted and a bold
- * font where weight is wanted. The command names are bold rather than
- * underlined on purpose. Underline reads as "clickable" to everyone who has
- * used a computer, and these are not; bold brings them forward without making
- * that promise, and without the eyesore of a second heading-sized run.
+ *   Windows' task dialog looks the part and can hold links, but only in its
+ *   content and footer: the main instruction, the one piece of text with any
+ *   visual weight, cannot be one. And its markup is links and nothing else -
+ *   no bold, and no italics anywhere at all.
+ *
+ *   A dialog of static controls gets bold, because a static can be given a bold
+ *   font. It cannot get italics *within a sentence*, because a static control
+ *   has exactly one font.
+ *
+ * So: a dialog whose prose lives in a rich edit control, which is the one
+ * common control that can change font mid-sentence. Command names are bold
+ * where they head a paragraph and italic where they appear inside one; links
+ * are SysLink controls, which handle their own hit-testing and keyboard focus.
+ *
+ * The two-band background - white above, the button face below, divided by a
+ * rule - is the task dialog's own layout, reproduced because it reads better
+ * than a flat gray sheet. That appearance never depended on the task dialog.
  *
  * There are no Illustrator types below. That is what lets tools/AboutHarness
- * build this same dialog into a standalone executable and show it, which is the
- * only way to actually look at a modal dialog that otherwise only ever appears
- * inside a host application.
+ * build this same file and show it, which is the only way to actually look at a
+ * modal dialog that otherwise appears only inside a host application.
  */
 
 #ifdef _WIN32
@@ -45,21 +54,75 @@
 
 #include <commctrl.h>
 #include <shellapi.h>
+#include <richedit.h>
+#include <cstring>
 
 #pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "comctl32.lib")
 
 /* SG_WVERSION, SG_EMDASH, SG_COPY and the two URLs come from SubgroupID.h, so
-   the dialog and the plain-alert fallback in SubgroupPlugin.cpp cannot drift
-   apart. */
+   the dialog and the plain-alert fallback in SubgroupPlugin.cpp cannot drift. */
 
 namespace {
 
-struct AboutFonts {
-    HFONT title;
-    HFONT bold;
-    HFONT small_;
+/* The prose, as RTF.
+ *
+ * Command names are bold where they head a paragraph and italic where they are
+ * mentioned inside one, which is the distinction a reader actually needs: the
+ * heading says "this is the command", the italic says "this names something in
+ * the interface".
+ *
+ * The em dash is written as an RTF Unicode escape: backslash-u, the decimal
+ * code point, then a replacement character for readers that cannot cope, so
+ * the trailing "?" is that fallback rather than a typo. Keeping it in this
+ * form leaves the file plain ASCII, the same reason the wide literals
+ * elsewhere use \x escapes.
+ *
+ * \fs18 is 9pt: RTF measures in half-points. */
+const char* const kBodyRtf =
+    "{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0\\fnil Segoe UI;}}"
+    /* \sa140 is 7pt of space after each paragraph. Without it the sections run
+       together: \par alone starts a new paragraph but adds no gap, which reads
+       as one wall of text. */
+    "\\fs18\\sa140 "
+
+    "{\\b Nest Down}\\line "
+    "Adds a level of grouping inside the selection, including when that "
+    "selection is an entire group \\u8212? the case {\\i Object > Group} "
+    "declines.\\par "
+
+    "{\\b Nest Up}\\line "
+    "Adds that level around the selection instead, rather than inside it.\\par "
+
+    "{\\b Align Group To Selected}\\line "
+    "Aligns a group's contents to one object selected inside it, which "
+    "{\\i Align} cannot otherwise reach: selecting every object in a group "
+    "{\\i is} selecting the group, leaving nothing to align to."
+    "}";
+
+struct AboutState {
+    HFONT  title;
+    HFONT  legal;
+    HBRUSH white;
+    int    splitY;      /* pixel row where the white panel ends */
+    HMODULE richEdit;
 };
+
+/* Feeds a fixed buffer to EM_STREAMIN. */
+struct RtfSource { const char* text; size_t left; };
+
+DWORD CALLBACK RtfReader(DWORD_PTR cookie, LPBYTE buffer, LONG wanted, LONG* done)
+{
+    RtfSource* src = reinterpret_cast<RtfSource*>(cookie);
+    LONG n = (static_cast<LONG>(src->left) < wanted) ? static_cast<LONG>(src->left) : wanted;
+    if (n > 0) {
+        memcpy(buffer, src->text, static_cast<size_t>(n));
+        src->text += n;
+        src->left -= static_cast<size_t>(n);
+    }
+    *done = n;
+    return 0;
+}
 
 /* Derives a font from the dialog's own, so it follows whatever the user's shell
    font and DPI actually are instead of hard-coding a face and a pixel size. */
@@ -71,26 +134,16 @@ HFONT DeriveFont(HWND dlg, int percentOfHeight, bool bold)
     LOGFONTW lf;
     if (GetObjectW(base, sizeof(lf), &lf) == 0) return nullptr;
 
-    /* lfHeight is negative for character height, so scale the magnitude. */
-    LONG h = lf.lfHeight;
+    LONG h = lf.lfHeight;                     /* negative for character height */
     lf.lfHeight = (h < 0) ? -MulDiv(-h, percentOfHeight, 100)
                           :  MulDiv( h, percentOfHeight, 100);
     if (bold) lf.lfWeight = FW_BOLD;
-
     return CreateFontIndirectW(&lf);
 }
 
-void SetControlFont(HWND dlg, int id, HFONT font)
-{
-    if (font == nullptr) return;
-    HWND ctl = GetDlgItem(dlg, id);
-    if (ctl != nullptr) SendMessageW(ctl, WM_SETFONT, reinterpret_cast<WPARAM>(font), TRUE);
-}
-
-/* Opens a link. Anything a SysLink hands back is one of ours, from the resource
-   below, but check the scheme anyway: ShellExecute will happily launch things
-   that are not URLs, and a habit of feeding it unchecked strings is how that
-   turns into a bug later. */
+/* Anything a SysLink hands back came from the strings below, but check the
+   scheme anyway: ShellExecute will happily launch things that are not URLs, and
+   feeding it unchecked strings is how that becomes a bug later. */
 void OpenLink(HWND parent, const wchar_t* url)
 {
     if (url == nullptr) return;
@@ -98,39 +151,57 @@ void OpenLink(HWND parent, const wchar_t* url)
     ShellExecuteW(parent, L"open", url, nullptr, nullptr, SW_SHOWNORMAL);
 }
 
+void FillBody(HWND dlg)
+{
+    HWND body = GetDlgItem(dlg, IDC_ABOUT_BODY);
+    if (body == nullptr) return;
+
+    SendMessageW(body, EM_SETBKGNDCOLOR, 0, static_cast<LPARAM>(GetSysColor(COLOR_WINDOW)));
+    SendMessageW(body, EM_SETMARGINS, EC_LEFTMARGIN | EC_RIGHTMARGIN, 0);
+    SendMessageW(body, EM_EXLIMITTEXT, 0, 64 * 1024);
+
+    RtfSource src = { kBodyRtf, strlen(kBodyRtf) };
+    EDITSTREAM es = { 0 };
+    es.dwCookie    = reinterpret_cast<DWORD_PTR>(&src);
+    es.pfnCallback = RtfReader;
+    SendMessageW(body, EM_STREAMIN, SF_RTF, reinterpret_cast<LPARAM>(&es));
+
+    /* Read-only edits still show a selection and a caret when focused. Neither
+       belongs in a paragraph of prose, so keep the control out of the tab order
+       entirely - it is set WS_DISABLED-free but never focusable in the
+       template. */
+    SendMessageW(body, EM_SETSEL, static_cast<WPARAM>(-1), 0);
+    SendMessageW(body, EM_HIDESELECTION, TRUE, 0);
+}
+
 INT_PTR CALLBACK AboutProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+    AboutState* st = reinterpret_cast<AboutState*>(GetWindowLongPtrW(dlg, DWLP_USER));
+
     switch (msg) {
     case WM_INITDIALOG: {
-        AboutFonts* fonts = new AboutFonts();
-        fonts->title  = DeriveFont(dlg, 150, true);
-        fonts->bold   = DeriveFont(dlg, 100, true);
-        fonts->small_ = DeriveFont(dlg,  92, false);
-        SetWindowLongPtrW(dlg, DWLP_USER, reinterpret_cast<LONG_PTR>(fonts));
+        st = new AboutState();
+        st->title    = DeriveFont(dlg, 150, false);
+        st->legal    = DeriveFont(dlg,  92, false);
+        st->white    = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+        st->richEdit = nullptr;
+        SetWindowLongPtrW(dlg, DWLP_USER, reinterpret_cast<LONG_PTR>(st));
 
-        SetControlFont(dlg, IDC_ABOUT_TITLE, fonts->title);
-        SetControlFont(dlg, IDC_ABOUT_NAME1, fonts->bold);
-        SetControlFont(dlg, IDC_ABOUT_NAME2, fonts->bold);
-        SetControlFont(dlg, IDC_ABOUT_NAME3, fonts->bold);
-        SetControlFont(dlg, IDC_ABOUT_LEGAL, fonts->small_);
+        /* Where the white panel ends, in pixels. Expressed in dialog units so
+           it tracks the font and DPI like everything else. */
+        RECT split = { 0, kAboutSplitDlgY, 1, kAboutSplitDlgY + 1 };
+        MapDialogRect(dlg, &split);
+        st->splitY = split.top;
+
+        if (st->title) SendDlgItemMessageW(dlg, IDC_ABOUT_TITLE, WM_SETFONT,
+                                           reinterpret_cast<WPARAM>(st->title), TRUE);
+        if (st->legal) SendDlgItemMessageW(dlg, IDC_ABOUT_LEGAL, WM_SETFONT,
+                                           reinterpret_cast<WPARAM>(st->legal), TRUE);
 
         SetDlgItemTextW(dlg, IDC_ABOUT_TITLE,
             L"<a href=\"" SG_REPO_URL L"\">Subgroup " SG_WVERSION L"</a>");
 
-        SetDlgItemTextW(dlg, IDC_ABOUT_NAME1, L"Nest Down");
-        SetDlgItemTextW(dlg, IDC_ABOUT_DESC1,
-            L"Adds a level of grouping inside the selection, including when the "
-            L"selection is an entire group " SG_EMDASH L" the case Object > Group "
-            L"declines.");
-
-        SetDlgItemTextW(dlg, IDC_ABOUT_NAME2, L"Nest Up");
-        SetDlgItemTextW(dlg, IDC_ABOUT_DESC2,
-            L"Adds that level around the selection instead.");
-
-        SetDlgItemTextW(dlg, IDC_ABOUT_NAME3, L"Align Group To Selected");
-        SetDlgItemTextW(dlg, IDC_ABOUT_DESC3,
-            L"Aligns a group's contents to one object selected inside it, which "
-            L"Illustrator's own Align cannot reach.");
+        FillBody(dlg);
 
         /* The GPL asks an interactive program to show this where the user can
            find it. For a plug-in with no window of its own, that is here. */
@@ -140,7 +211,6 @@ INT_PTR CALLBACK AboutProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
             L"later, with an Adobe Illustrator SDK linking exception. It comes "
             L"with ABSOLUTELY NO WARRANTY.");
 
-        /* Center on the owner, or on the screen when there is none. */
         RECT dr;
         GetWindowRect(dlg, &dr);
         HWND owner = GetWindow(dlg, GW_OWNER);
@@ -153,19 +223,50 @@ INT_PTR CALLBACK AboutProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
                      0, 0, SWP_NOSIZE | SWP_NOZORDER);
 
         /* Focus OK rather than letting the dialog manager give it to the first
-           tab stop, which is the title link: it would open with a focus
-           rectangle drawn around the heading, and Enter would open a browser
-           instead of closing the box. Returning FALSE says focus is set. */
+           tab stop, which is the title link: the box would open with a focus
+           rectangle drawn around its heading, and Enter would open a browser
+           instead of closing it. Returning FALSE says focus is already set. */
         SetFocus(GetDlgItem(dlg, IDOK));
         return FALSE;
+    }
+
+    case WM_ERASEBKGND: {
+        if (st == nullptr) break;
+        HDC dc = reinterpret_cast<HDC>(wParam);
+        RECT rc;
+        GetClientRect(dlg, &rc);
+
+        RECT upper = rc; upper.bottom = st->splitY;
+        FillRect(dc, &upper, st->white);
+
+        RECT lower = rc; lower.top = st->splitY;
+        FillRect(dc, &lower, GetSysColorBrush(COLOR_BTNFACE));
+
+        /* The rule between the panels, in the same color the task dialog uses
+           for it. */
+        RECT rule = { rc.left, st->splitY, rc.right, st->splitY + 1 };
+        FillRect(dc, &rule, GetSysColorBrush(COLOR_3DLIGHT));
+        return TRUE;
+    }
+
+    /* SysLink and static controls paint their own background, so they have to
+       be told which panel they are sitting on. */
+    case WM_CTLCOLORSTATIC: {
+        if (st == nullptr) break;
+        HWND ctl = reinterpret_cast<HWND>(lParam);
+        if (GetDlgCtrlID(ctl) == IDC_ABOUT_TITLE) {
+            SetBkMode(reinterpret_cast<HDC>(wParam), TRANSPARENT);
+            return reinterpret_cast<INT_PTR>(st->white);
+        }
+        SetBkMode(reinterpret_cast<HDC>(wParam), TRANSPARENT);
+        return reinterpret_cast<INT_PTR>(GetSysColorBrush(COLOR_BTNFACE));
     }
 
     case WM_NOTIFY: {
         const NMHDR* hdr = reinterpret_cast<const NMHDR*>(lParam);
         if (hdr != nullptr && (hdr->code == NM_CLICK || hdr->code == NM_RETURN) &&
             (hdr->idFrom == IDC_ABOUT_TITLE || hdr->idFrom == IDC_ABOUT_LEGAL)) {
-            const NMLINK* link = reinterpret_cast<const NMLINK*>(lParam);
-            OpenLink(dlg, link->item.szUrl);
+            OpenLink(dlg, reinterpret_cast<const NMLINK*>(lParam)->item.szUrl);
             return TRUE;
         }
         break;
@@ -178,18 +279,15 @@ INT_PTR CALLBACK AboutProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
         }
         break;
 
-    case WM_DESTROY: {
-        AboutFonts* fonts =
-            reinterpret_cast<AboutFonts*>(GetWindowLongPtrW(dlg, DWLP_USER));
-        if (fonts != nullptr) {
-            if (fonts->title)  DeleteObject(fonts->title);
-            if (fonts->bold)   DeleteObject(fonts->bold);
-            if (fonts->small_) DeleteObject(fonts->small_);
-            delete fonts;
+    case WM_DESTROY:
+        if (st != nullptr) {
+            if (st->title) DeleteObject(st->title);
+            if (st->legal) DeleteObject(st->legal);
+            if (st->white) DeleteObject(st->white);
+            delete st;
             SetWindowLongPtrW(dlg, DWLP_USER, 0);
         }
         break;
-    }
 
     default:
         break;
@@ -203,14 +301,22 @@ bool SubgroupShowAboutDialog(HINSTANCE instance, HWND parent)
 {
     /* SysLink lives in version 6 of the common controls. Whether a host process
        has that in its activation context is the host's business, so ask rather
-       than assume - and let the caller fall back if the answer is no. */
+       than assume, and let the caller fall back if the answer is no. */
     INITCOMMONCONTROLSEX icc;
     icc.dwSize = sizeof(icc);
     icc.dwICC  = ICC_LINK_CLASS | ICC_STANDARD_CLASSES;
     if (!InitCommonControlsEx(&icc)) return false;
 
+    /* Loading Msftedit is what registers the RICHEDIT50W window class the
+       dialog template names. Without it the control silently fails to create
+       and the dialog comes up with a hole in it, so treat it as required. */
+    HMODULE richEdit = LoadLibraryW(L"Msftedit.dll");
+    if (richEdit == nullptr) return false;
+
     INT_PTR r = DialogBoxParamW(instance, MAKEINTRESOURCEW(IDD_SUBGROUP_ABOUT),
                                 parent, AboutProc, 0);
+
+    FreeLibrary(richEdit);
     return r != -1 && r != 0;
 }
 
