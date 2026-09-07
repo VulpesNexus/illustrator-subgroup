@@ -24,7 +24,7 @@ least three objects." That turns out to be a symptom, not the rule.
 Driving the live application and reading back what the selection model actually
 contains gives this:
 
-| What was requested | What `app.selection` came back as | `Ctrl+G` result |
+| What was requested | What `app.selection` came back as | *Ctrl+G* result |
 | --- | --- | --- |
 | Both children of a 2-object group | `len=1 [GroupItem]` | no-op |
 | **All three** children of a 3-object group | `len=1 [GroupItem]` | **no-op** |
@@ -54,7 +54,7 @@ is not about containers generally. It is specific to groups.
 
 Both of the original complaints fall out of that one rule:
 
-- **Subgrouping.** `Ctrl+G` never sees two objects; it sees one group, and
+- **Subgrouping.** *Ctrl+G* never sees two objects; it sees one group, and
   grouping a lone group is suppressed as redundant (verified separately: a
   single selected group put through the Group command stays parented to its
   layer).
@@ -81,7 +81,7 @@ group selected directly           : selection = len=1 [GroupItem]   children .se
 ```
 
 Indistinguishable. Every readable property is identical. And from that hand-made
-state, `Horizontal Align Left` moved nothing at all — both objects' bounds were
+state, *Horizontal Align Left* moved nothing at all — both objects' bounds were
 byte-identical before and after — while the Group command produced no nesting.
 
 The circle drives **appearance targeting**, a channel parallel to selection, and
@@ -109,7 +109,7 @@ child makes the parent group report `selected = true` as well, because on a
 container that property means *contains a selection*, not *is selected*. A group
 and its children can be targeted at once, which for appearance is meaningful — a
 drop shadow on the group plus a stroke on each child. Structural commands need
-the opposite: a flat, unambiguous set. Were `Ctrl+G` to consume targets, "both
+the opposite: a flat, unambiguous set. Were *Ctrl+G* to consume targets, "both
 children targeted", "the group targeted", and "all three targeted" would all be
 legal inputs, and the first two are exactly the ambiguity Illustrator declines to
 resolve.
@@ -130,11 +130,11 @@ every direct-manipulation operation — drag, scale, rotate, delete, or transfor
 and produce precisely the same result. Keeping two distinct internal
 representations of an identical manipulation state would need an answer for what
 the bounding box and handles look like, what the Appearance panel targets, what
-`Ctrl+G` means, and what `Ctrl+Shift+G` means, in each of them. Collapsing to the
+*Ctrl+G* means, and what *Ctrl+Shift+G* means, in each of them. Collapsing to the
 group removes the ambiguity at the cost of making one state unrepresentable.
 
-The suppression of `Ctrl+G` on an already-complete group has an obvious
-companion motive: `Ctrl+G` is hammered, and without a guard every extra press
+The suppression of *Ctrl+G* on an already-complete group has an obvious
+companion motive: *Ctrl+G* is hammered, and without a guard every extra press
 would add another invisible wrapper, each of which is a real transform and
 clipping scope in the imaging model. The guard stops accidental depth. It also
 stops deliberate depth, which is the actual complaint.
@@ -148,7 +148,7 @@ anything structural.
 Measured, not assumed:
 
 - **The file format is fine.** `Group(Group(A, B))` and even the fully
-  degenerate `Group(Group(single path))` were saved to `.ai`, closed, and
+  degenerate `Group(Group(single path))` were saved to *.ai*, closed, and
   reopened with nesting, names, and z-order all intact.
 - **Illustrator already builds these shapes itself.** Grouping two existing
   groups nests groups; single-child groups are creatable through the normal UI.

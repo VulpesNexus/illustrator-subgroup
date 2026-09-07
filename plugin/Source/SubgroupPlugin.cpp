@@ -694,6 +694,7 @@ void SubgroupPlugin::ShowAboutBox()
         L"Aligns a group's contents to one object selected inside it, which "
         L"Illustrator's own Align cannot reach.\n\n"
         SG_REPO_URL L"\n\n"
+        L"Vibecoded by Vixen420 in September 2026.\n"
         L"Copyright " SG_COPY L" 2026 Vixen420. Free software under the GNU "
         L"General Public License, version 3 or later, with an Adobe Illustrator "
         L"SDK linking exception. It comes with ABSOLUTELY NO WARRANTY.";

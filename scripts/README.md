@@ -1,13 +1,13 @@
 # Subgroup — the ExtendScript version
 
 The no-SDK fallback, and the only route if you would rather not build anything.
-These *do* rebind `Ctrl+G`; [the plug-in](../README.md) avoids that.
+These *do* rebind *Ctrl+G*; [the plug-in](../README.md) avoids that.
 
 Two commands and a settings dialog, sharing one persistent store.
 
-## `Group.jsx` — the augmented Ctrl+G
+## *Group.jsx* — the augmented Ctrl+G
 
-Assign `Ctrl+G` to this and grouping starts working where Illustrator declines.
+Assign *Ctrl+G* to this and grouping starts working where Illustrator declines.
 
 It is built around one rule: **Illustrator gets first refusal.** The script calls
 the native Group command first and watches whether a probe item was reparented.
@@ -29,7 +29,7 @@ selection still produces byte-identical native placement; the toggle off leaves
 structure untouched; wrap mode works; a locked child is a silent no-op; and an
 empty selection does not throw.
 
-## `Settings.jsx` — the toggles
+## *Settings.jsx* — the toggles
 
 Augmented grouping on/off, and whether the new level goes inside the group or
 around it.
@@ -39,7 +39,7 @@ Illustrator's preference getters have no usable "unset" sentinel, and only
 `getStringPreference` returns anything a default can be told apart from. See
 [implementation notes](../docs/implementation-notes.md).
 
-## `Align To Anchor.jsx`
+## *Align To Anchor.jsx*
 
 Aligns objects to an anchor picked from a list, replacing the key-object gesture
 rather than trying to reach it. Select the **group** and run it: the dialog lists
@@ -54,7 +54,7 @@ applied in one go.
 
 ## Install
 
-Copy the folder itself — keeping `lib/` inside it — into Illustrator's Scripts
+Copy the folder itself — keeping *lib/* inside it — into Illustrator's Scripts
 folder:
 
 ```
@@ -62,13 +62,13 @@ C:\Program Files\Adobe\Adobe Illustrator 2026\Presets\en_US\Scripts\Subgroup\
 ```
 
 Restart Illustrator. Because it is a subfolder, the entries appear together
-under **File > Scripts > Subgroup** rather than scattered through the menu.
-`lib/` must stay beside the scripts; it is pulled in with a relative `#include`,
-and the `.jsxinc` extension keeps those files out of the menu.
+under *File > Scripts > Subgroup* rather than scattered through the menu.
+*lib/* must stay beside the scripts; it is pulled in with a relative `#include`,
+and the *.jsxinc* extension keeps those files out of the menu.
 
-Binding `Ctrl+G` is safe because the script's first action is to call the very
+Binding *Ctrl+G* is safe because the script's first action is to call the very
 command it just took the shortcut from — but it is a global reassignment rather
 than a hook. If the folder is moved or deleted without clearing the shortcut,
-`Ctrl+G` stops working until you restore it. That is the honest cost of the
+*Ctrl+G* stops working until you restore it. That is the honest cost of the
 scripting route, and the reason the plug-in exists.
 

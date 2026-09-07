@@ -25,7 +25,7 @@
 // DPI rather than a pixel guess. The white panel ends at kAboutSplitDlgY; the
 // dialog procedure paints the two bands and the rule between them.
 
-IDD_SUBGROUP_ABOUT DIALOGEX 0, 0, 284, 226
+IDD_SUBGROUP_ABOUT DIALOGEX 0, 0, 284, 244
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About Subgroup"
 FONT 9, "Segoe UI", 400, 0, 0x0
@@ -40,7 +40,10 @@ BEGIN
                     ES_MULTILINE | ES_READONLY | WS_CHILD | WS_VISIBLE,
                     16, 40, 252, 110
 
-    // On the button band, below kAboutSplitDlgY.
+    // On the button band, below kAboutSplitDlgY. The attribution heads the
+    // block and carries the author link; the notice below it repeats the name
+    // without one, because the same address twice in one paragraph is noise.
     DEFPUSHBUTTON   "OK", IDOK, 216, 166, 52, 15
-    CONTROL         "", IDC_ABOUT_LEGAL, "SysLink", WS_TABSTOP, 16, 190, 252, 30
+    CONTROL         "", IDC_ABOUT_ATTRIB, "SysLink", WS_TABSTOP, 16, 188, 252, 11
+    CONTROL         "", IDC_ABOUT_LEGAL,  "SysLink", WS_TABSTOP, 16, 202, 252, 32
 END

@@ -195,6 +195,8 @@ INT_PTR CALLBACK AboutProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 
         if (st->title) SendDlgItemMessageW(dlg, IDC_ABOUT_TITLE, WM_SETFONT,
                                            reinterpret_cast<WPARAM>(st->title), TRUE);
+        if (st->legal) SendDlgItemMessageW(dlg, IDC_ABOUT_ATTRIB, WM_SETFONT,
+                                           reinterpret_cast<WPARAM>(st->legal), TRUE);
         if (st->legal) SendDlgItemMessageW(dlg, IDC_ABOUT_LEGAL, WM_SETFONT,
                                            reinterpret_cast<WPARAM>(st->legal), TRUE);
 
@@ -203,10 +205,17 @@ INT_PTR CALLBACK AboutProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 
         FillBody(dlg);
 
+        /* The author link lives on this name rather than on the one in the
+           copyright below. The notice is a legal statement and reads better
+           without a link in the middle of it, and the same address twice in one
+           block would be the noise the source-code line was removed for. */
+        SetDlgItemTextW(dlg, IDC_ABOUT_ATTRIB,
+            L"Vibecoded by <a href=\"" SG_AUTHOR_URL L"\">Vixen420</a> in September 2026.");
+
         /* The GPL asks an interactive program to show this where the user can
            find it. For a plug-in with no window of its own, that is here. */
         SetDlgItemTextW(dlg, IDC_ABOUT_LEGAL,
-            L"Copyright " SG_COPY L" 2026 <a href=\"" SG_AUTHOR_URL L"\">Vixen420</a>. "
+            L"Copyright " SG_COPY L" 2026 Vixen420. "
             L"Free software under the GNU General Public License, version 3 or "
             L"later, with an Adobe Illustrator SDK linking exception. It comes "
             L"with ABSOLUTELY NO WARRANTY.");
@@ -265,7 +274,8 @@ INT_PTR CALLBACK AboutProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_NOTIFY: {
         const NMHDR* hdr = reinterpret_cast<const NMHDR*>(lParam);
         if (hdr != nullptr && (hdr->code == NM_CLICK || hdr->code == NM_RETURN) &&
-            (hdr->idFrom == IDC_ABOUT_TITLE || hdr->idFrom == IDC_ABOUT_LEGAL)) {
+            (hdr->idFrom == IDC_ABOUT_TITLE || hdr->idFrom == IDC_ABOUT_ATTRIB ||
+             hdr->idFrom == IDC_ABOUT_LEGAL)) {
             OpenLink(dlg, reinterpret_cast<const NMLINK*>(lParam)->item.szUrl);
             return TRUE;
         }

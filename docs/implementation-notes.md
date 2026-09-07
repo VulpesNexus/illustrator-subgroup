@@ -14,13 +14,13 @@ For what the underlying restriction actually is, see
 ### The command notifiers cannot carry this feature
 
 The first design listened to `kAIGroupCommandPreNotifierStr` /
-`…PostNotifierStr` around Object > Group, on the theory that `Ctrl+G` need never
+`…PostNotifierStr` around Object > Group, on the theory that *Ctrl+G* need never
 be rebound. **That does not work.**
 
 Illustrator does not dispatch Object > Group *at all* when the selection is
 already a single group. Measured by hand at the keyboard: grouping two loose
 rectangles fires `Before Group` and `After Group` normally, and pressing
-`Ctrl+G` again on the resulting group fires **nothing**. The command is
+*Ctrl+G* again on the resulting group fires **nothing**. The command is
 short-circuited before it runs, so there is no notifier in exactly the case this
 plug-in exists to handle.
 
@@ -35,18 +35,18 @@ the diagnostic build can log whether the native command ran.
 `AIMenuSuite::SetItemCmd` is not a way out. Calling `SetItemCmd(item, 'g', 0)`
 returns `kNoErr` and `GetItemCmd` reads the value back correctly, but
 Illustrator does not honor a plug-in's claim over a shortcut an existing
-built-in owns: `Ctrl+G` still reaches Object > Group. It reports success and
+built-in owns: *Ctrl+G* still reaches Object > Group. It reports success and
 silently declines.
 
 Worse, it re-asserts that conflicting binding at every launch, quietly editing
 the user's saved keyboard set. The call is deliberately absent from this
 plug-in and should stay absent.
 
-`.kys` files are plain PostScript-style text, so a keyboard set can be inspected
+*.kys* files are plain PostScript-style text, so a keyboard set can be inspected
 directly: `/Menus { /<command name> { /Context /Modifiers /Represent /Key } }`,
-where Modifiers 64 is Ctrl and Key 71 is `G`. This is also why
+where Modifiers 64 is Ctrl and Key 71 is *G*. This is also why
 `kSubgroupGroupCmd` must never be renamed — it is the key the assignment is
-stored under, and changing it silently orphans the user's `Ctrl+G`.
+stored under, and changing it silently orphans the user's *Ctrl+G*.
 
 ### A plug-in cannot add items to a native submenu's group
 
@@ -123,13 +123,13 @@ controls. The two-band background — white above, button face below, divided by
 a rule — is the task dialog's own layout, reproduced by hand; that appearance
 never depended on the task dialog.
 
-`Msftedit.dll` must be loaded before the dialog is created, since that is what
+*Msftedit.dll* must be loaded before the dialog is created, since that is what
 registers the `RICHEDIT50W` class the template names. Without it the control
 silently fails to create and the dialog comes up with a hole in it.
 
 **DOM-driven verification does not reproduce hand gestures**, and this is the
 methodological lesson of the whole project. `executeMenuCommand` is not
-`Ctrl+G`; `app.selection = [...]` is not a click — it never leaves an object
+*Ctrl+G*; `app.selection = [...]` is not a click — it never leaves an object
 partially selected, and `app.selection = null` triggers deselect handling a
 click does not. Every one of the dead ends above passed a scripted test before
 failing in the hand.
@@ -140,9 +140,9 @@ failing in the hand.
 
 A modal dialog inside a host application is close to untestable: you cannot
 drive it, screenshot it, or measure it without a person sitting in front of it.
-So `SubgroupAbout.cpp` is written free of every Illustrator type — it takes a
+So *SubgroupAbout.cpp* is written free of every Illustrator type — it takes a
 module handle and a parent window and touches nothing else — and
-`tools/AboutHarness/build.cmd` compiles that same file and that same dialog
+*tools/AboutHarness/build.cmd* compiles that same file and that same dialog
 resource into a small executable that just shows it.
 
 ```
