@@ -1,7 +1,7 @@
 # Why Illustrator declines
 
 The measured answer to "why can I not subgroup two objects, and why will
-Align not take one of them as an anchor?" Both fall out of a single rule,
+*Align* not take one of them as an anchor?" Both fall out of a single rule,
 and it is not the one everyone repeats.
 
 Everything here was measured by driving the running application over its COM
@@ -56,16 +56,16 @@ Both of the original complaints fall out of that one rule:
 
 - **Subgrouping.** *Ctrl+G* never sees two objects; it sees one group, and
   grouping a lone group is suppressed as redundant (verified separately: a
-  single selected group put through the Group command stays parented to its
+  single selected group put through the *Group* command stays parented to its
   layer).
 - **Align anchor.** A key object is designated by clicking an object that is
   already selected alongside others, so it needs two or more separately selected
   objects. When the group holds exactly the objects you want to align, the
   selection is one group and there is nothing to nominate.
 
-## What about the Layers panel's two columns?
+## What about the *Layers* panel's two columns?
 
-The obvious objection: the Layers panel already offers two ways to click an
+The obvious objection: the *Layers* panel already offers two ways to click an
 object, and they visibly differ. Clicking the **target circle** on each child
 keeps them looking individually selected, while clicking **to the right of the
 circle** resolves to the whole group. Adobe evidently built two mechanisms with
@@ -124,7 +124,7 @@ existing one.
 Adobe has never documented a rationale, so this part is inference rather than
 measurement.
 
-In Illustrator a group is itself a selectable, directly manipulable object. For
+In Illustrator, a group is itself a selectable, directly manipulable object. For
 every direct-manipulation operation — drag, scale, rotate, delete, or transform
 — "all children selected" and "the group selected" mean precisely the same thing
 and produce precisely the same result. Keeping two distinct internal
@@ -161,9 +161,9 @@ Measured, not assumed:
 The one real consequence is unavoidable and worth knowing: **the selection rule
 still applies afterward.** After nesting `Group(A, B)` into `Group(Group(A, B))`,
 clicking the art still resolves to the outer group. The new level is real and
-addressable in the Layers panel, but it did not create a new selection state,
+addressable in the *Layers* panel, but it did not create a new selection state,
 because nothing can — the rule lives in the selection model, upstream of the
-commands, and not even the Layers panel's target column escapes it. This plugin
+commands, and not even the *Layers* panel's target column escapes it. This plugin
 changes structure; it does not change what a click means.
 
 The other consequence is the one Adobe's guard was protecting against: nesting
