@@ -22,3 +22,9 @@ dist/
 # Binary parked aside because Illustrator had it open; safe to delete once
 # Illustrator has been restarted.
 *.inuse
+
+# Harness build output (tools/AboutHarness/build.cmd)
+tools/AboutHarness/*.exe
+tools/AboutHarness/*.obj
+tools/AboutHarness/*.res
+tools/AboutHarness/*.pdb

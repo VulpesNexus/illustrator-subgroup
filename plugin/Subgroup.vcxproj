@@ -121,7 +121,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\Source;.\Resources;$(AISDK)\samplecode\common\includes;$(AISDK)\illustratorapi\adm;$(AISDK)\illustratorapi\ate;$(AISDK)\illustratorapi\illustrator;$(AISDK)\illustratorapi\illustrator\actions;$(AISDK)\illustratorapi\pica_sp;$(AISDK)\illustratorapi\illustrator\legacy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\Resources;.\Resources\Win;$(AISDK)\samplecode\common\includes;$(AISDK)\illustratorapi\adm;$(AISDK)\illustratorapi\ate;$(AISDK)\illustratorapi\illustrator;$(AISDK)\illustratorapi\illustrator\actions;$(AISDK)\illustratorapi\pica_sp;$(AISDK)\illustratorapi\illustrator\legacy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN_ENV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <StructMemberAlignment>8Bytes</StructMemberAlignment>
@@ -178,7 +178,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\Source;.\Resources;$(AISDK)\samplecode\common\includes;$(AISDK)\illustratorapi\adm;$(AISDK)\illustratorapi\ate;$(AISDK)\illustratorapi\illustrator;$(AISDK)\illustratorapi\illustrator\actions;$(AISDK)\illustratorapi\pica_sp;$(AISDK)\illustratorapi\illustrator\legacy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\Resources;.\Resources\Win;$(AISDK)\samplecode\common\includes;$(AISDK)\illustratorapi\adm;$(AISDK)\illustratorapi\ate;$(AISDK)\illustratorapi\illustrator;$(AISDK)\illustratorapi\illustrator\actions;$(AISDK)\illustratorapi\pica_sp;$(AISDK)\illustratorapi\illustrator\legacy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN_ENV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <StructMemberAlignment>8Bytes</StructMemberAlignment>
@@ -235,7 +235,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\Source;.\Resources;$(AISDK)\samplecode\common\includes;$(AISDK)\illustratorapi\adm;$(AISDK)\illustratorapi\ate;$(AISDK)\illustratorapi\illustrator;$(AISDK)\illustratorapi\illustrator\actions;$(AISDK)\illustratorapi\pica_sp;$(AISDK)\illustratorapi\illustrator\legacy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\Resources;.\Resources\Win;$(AISDK)\samplecode\common\includes;$(AISDK)\illustratorapi\adm;$(AISDK)\illustratorapi\ate;$(AISDK)\illustratorapi\illustrator;$(AISDK)\illustratorapi\illustrator\actions;$(AISDK)\illustratorapi\pica_sp;$(AISDK)\illustratorapi\illustrator\legacy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;WIN_ENV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <StructMemberAlignment>8Bytes</StructMemberAlignment>
@@ -292,7 +292,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\Source;.\Resources;$(AISDK)\samplecode\common\includes;$(AISDK)\illustratorapi\adm;$(AISDK)\illustratorapi\ate;$(AISDK)\illustratorapi\illustrator;$(AISDK)\illustratorapi\illustrator\actions;$(AISDK)\illustratorapi\pica_sp;$(AISDK)\illustratorapi\illustrator\legacy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\Resources;.\Resources\Win;$(AISDK)\samplecode\common\includes;$(AISDK)\illustratorapi\adm;$(AISDK)\illustratorapi\ate;$(AISDK)\illustratorapi\illustrator;$(AISDK)\illustratorapi\illustrator\actions;$(AISDK)\illustratorapi\pica_sp;$(AISDK)\illustratorapi\illustrator\legacy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;WIN_ENV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <StructMemberAlignment>8Bytes</StructMemberAlignment>
@@ -338,6 +338,12 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\SubgroupAbout.cpp">
+      <!-- No precompiled header. This file is deliberately free of every
+           Illustrator include, which is what lets tools\AboutHarness build the
+           very same dialog into a standalone executable and show it. -->
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Source\SubgroupPlugin.cpp" />
     <ClCompile Include="Source\SubgroupSuites.cpp" />
     <ClCompile Include="$(AISDK)\samplecode\common\source\AppContext.cpp">
@@ -399,6 +405,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\SubgroupAbout.h" />
     <ClInclude Include="Source\SubgroupID.h" />
     <ClInclude Include="Source\SubgroupPlugin.h" />
     <ClInclude Include="Source\SubgroupSuites.h" />

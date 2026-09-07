@@ -5,7 +5,7 @@ grouping and alignment — without the junk-object workaround.
 
 - **Nest Down** and **Nest Up** add a level of grouping inside or around the
   selection, including when the selection is an entire group, which
-  Object → Group declines outright.
+  Object > Group declines outright.
 - **Align Group To Selected** aligns a group's contents to one object inside it,
   which Illustrator's own Align cannot reach.
 
@@ -173,7 +173,7 @@ That is now your decision rather than Illustrator's.
 
 ## The plug-in — `plugin/`
 
-Everything lives in one submenu, **Object → Subgroup**, placed directly above
+Everything lives in one submenu, **Object > Subgroup**, placed directly above
 Illustrator's own Group/Ungroup block:
 
 ```
@@ -201,8 +201,8 @@ level *inside* that group holding everything the group currently contains.
 Anywhere else it groups the selection exactly as Illustrator would, reproducing
 native placement rather than imitating it.
 
-Every command here is assignable under **Edit → Keyboard Shortcuts… → Menu
-Commands → Object → Subgroup**, like any other menu command. Nest Down is the
+Every command here is assignable under **Edit > Keyboard Shortcuts… > Menu
+Commands > Object > Subgroup**, like any other menu command. Nest Down is the
 one worth a key: give it `Ctrl+G` and grouping simply starts working where
 Illustrator declines, with nothing else changed. The plug-in deliberately does
 not claim any shortcut for you — see [The shortcut has to be assigned by
@@ -222,7 +222,7 @@ vertical triples, matching where Adobe puts it in the control bar.
 
 This is the one thing vanilla Illustrator cannot do. Everywhere else its key
 object covers it: with a *proper subset* of a group selected you can click one
-of them with the Selection tool to make it the key, and Object → Align works.
+of them with the Selection tool to make it the key, and Object > Align works.
 What it cannot reach is a group's contents as a whole, because selecting all of
 them *is* selecting the group — one object, so Align shifts the group against
 the artboard instead of arranging what is inside it.
@@ -238,7 +238,7 @@ the Align panel uses with *Use Preview Bounds* off — and moves each object wit
 a translation matrix through `TransformArt`. Locked and hidden siblings are
 skipped rather than reported.
 
-The commands gray out when they do not apply, the same way Object → Group does.
+The commands gray out when they do not apply, the same way Object > Group does.
 Align in particular needs exactly one child of one group selected: a whole group
 singles out nothing, and picks spread across two groups are ambiguous. Partial
 selection counts, so the Direct Selection tool works.
@@ -261,7 +261,7 @@ the newest group closed, which is what the collapse was presumably meant to do.
 
 ### Install
 
-Point **Preferences → Plug-ins & Scratch Disks → Additional Plug-ins Folder** at
+Point **Preferences > Plug-ins & Scratch Disks > Additional Plug-ins Folder** at
 `install/` and restart Illustrator. No admin rights, and deleting the `.aip`
 uninstalls it. Swapping the file needs Illustrator fully closed — it holds the
 plug-in open while running.
@@ -295,6 +295,24 @@ Note the SDK is version-gated per suite rather than by a declared interface
 version, so a CS6 SDK cannot produce a plug-in that loads into 30.7 — the v30
 SDK from the Adobe Developer Console is required.
 
+### Looking at the About dialog — `tools/AboutHarness/`
+
+A modal dialog inside a host application is close to untestable: you cannot
+drive it, screenshot it, or measure it without a person sitting in front of it.
+So `SubgroupAbout.cpp` is written free of every Illustrator type — it takes a
+module handle and a parent window and touches nothing else — and
+`tools/AboutHarness/build.cmd` compiles that same file and that same dialog
+resource into a small executable that just shows it.
+
+```
+tools\AboutHarness\build.cmd     from a Visual Studio x64 command prompt
+AboutHarness.exe                 show the dialog
+AboutHarness.exe /exit3000       show it, then close after three seconds
+```
+
+The harness `#include`s the plug-in's dialog template rather than copying it. A
+copy would stop being evidence about what ships.
+
 ---
 
 ## Dead ends, measured
@@ -305,10 +323,10 @@ each one costs a day to rediscover.
 ### The command notifiers cannot carry this feature
 
 The first design listened to `kAIGroupCommandPreNotifierStr` /
-`…PostNotifierStr` around Object → Group, on the theory that `Ctrl+G` need never
+`…PostNotifierStr` around Object > Group, on the theory that `Ctrl+G` need never
 be rebound. **That does not work.**
 
-Illustrator does not dispatch Object → Group *at all* when the selection is
+Illustrator does not dispatch Object > Group *at all* when the selection is
 already a single group. Measured by hand at the keyboard: grouping two loose
 rectangles fires `Before Group` and `After Group` normally, and pressing
 `Ctrl+G` again on the resulting group fires **nothing**. The command is
@@ -326,7 +344,7 @@ the diagnostic build can log whether the native command ran.
 `AIMenuSuite::SetItemCmd` is not a way out. Calling `SetItemCmd(item, 'g', 0)`
 returns `kNoErr` and `GetItemCmd` reads the value back correctly, but
 Illustrator does not honor a plug-in's claim over a shortcut an existing
-built-in owns: `Ctrl+G` still reaches Object → Group. It reports success and
+built-in owns: `Ctrl+G` still reaches Object > Group. It reports success and
 silently declines.
 
 Worse, it re-asserts that conflicting binding at every launch, quietly editing
@@ -393,10 +411,19 @@ opens Align. This is invisible to a scripted test, because setting
 `char*` and builds an `ai::UnicodeString` from it with the default encoding,
 which is the *platform* one — so an em dash or a copyright sign becomes mojibake
 on any machine whose code page is not Latin-1, and the author never sees it
-because their own machine usually is. Build the string as UTF-16 and call
-`AIUserSuite::MessageAlert` directly. Note also that `MessageAlert` is a plain OS
-alert: no styled runs, so no italics, no links. Windows' task dialog gives links
-and a bold heading, but still no italics anywhere.
+because their own machine usually is.
+
+It also ends in `AIUserSuite::MessageAlert`, a plain OS alert: one run of
+unstyled text, no emphasis, no links. Windows' task dialog can hold links, but
+only in its content and footer — its main instruction, the one piece of text
+with any visual weight, cannot be one, and nothing in it can be emphasized.
+Neither offers italics at all. So the About box here is an ordinary dialog
+resource with `SysLink` controls where a link is wanted and a bold font where
+weight is wanted, and its strings are UTF-16 with the non-ASCII characters
+written as escapes, so no compiler has to guess at a source file's encoding.
+
+Command names are bold rather than underlined on purpose: underline reads as
+*clickable* to anyone who has used a computer, and these are not.
 
 **DOM-driven verification does not reproduce hand gestures**, and this is the
 methodological lesson of the whole project. `executeMenuCommand` is not
@@ -469,7 +496,7 @@ C:\Program Files\Adobe\Adobe Illustrator 2026\Presets\en_US\Scripts\Subgroup\
 ```
 
 Restart Illustrator. Because it is a subfolder, the entries appear together
-under **File → Scripts → Subgroup** rather than scattered through the menu.
+under **File > Scripts > Subgroup** rather than scattered through the menu.
 `lib/` must stay beside the scripts; it is pulled in with a relative `#include`,
 and the `.jsxinc` extension keeps those files out of the menu.
 

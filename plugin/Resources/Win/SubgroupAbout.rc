@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Vixen420
+//
+// Subgroup is free software: you may redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version. It comes with ABSOLUTELY NO WARRANTY. See the file LICENSE, or
+// <https://www.gnu.org/licenses/>, for the full text.
+//
+// Additional permission under GPL-3.0 section 7: this file may be combined with
+// the Adobe Illustrator SDK, whose sample framework sources are compiled into
+// every plug-in built from it. See LICENSE-EXCEPTION.
+
+// The About dialog, kept in a file of its own so the plug-in's resource script
+// and tools/AboutHarness can compile the same template. If they diverged, the
+// harness would stop being evidence about the shipped dialog.
+//
+// Every string is set from SubgroupAbout.cpp rather than written here: they
+// contain an em dash and a copyright sign, and a resource script is compiled in
+// a single-byte code page. Keeping the text on the C++ side lets it be UTF-16
+// with those characters written as escapes, which no encoding can misread.
+//
+// Sizes are in dialog units, so the layout follows the user's shell font and
+// DPI rather than a pixel guess. Description fields are given room for more
+// lines than the text needs: they wrap, and a wider shell font makes them
+// taller, not shorter.
+
+IDD_SUBGROUP_ABOUT DIALOGEX 0, 0, 320, 206
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Subgroup"
+FONT 9, "Segoe UI", 400, 0, 0x0
+BEGIN
+    CONTROL         "", IDC_ABOUT_TITLE, "SysLink", WS_TABSTOP, 14, 12, 292, 18
+
+    LTEXT           "", IDC_ABOUT_NAME1, 14, 40, 292, 10
+    LTEXT           "", IDC_ABOUT_DESC1, 14, 51, 292, 28
+
+    LTEXT           "", IDC_ABOUT_NAME2, 14, 84, 292, 10
+    LTEXT           "", IDC_ABOUT_DESC2, 14, 95, 292, 18
+
+    LTEXT           "", IDC_ABOUT_NAME3, 14, 118, 292, 10
+    LTEXT           "", IDC_ABOUT_DESC3, 14, 129, 292, 28
+
+    CONTROL         "", IDC_ABOUT_LEGAL, "SysLink", WS_TABSTOP, 14, 162, 292, 26
+
+    DEFPUSHBUTTON   "OK", IDOK, 256, 186, 50, 14
+END

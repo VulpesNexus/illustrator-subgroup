@@ -65,8 +65,8 @@
     p3.margins = 14;
     var hint = p3.add("statictext", undefined,
         "None of this is active until Ctrl+G points here:\n" +
-        "Edit → Keyboard Shortcuts → Menu Commands → File → Scripts → Subgroup → Group.\n" +
-        "Illustrator will warn that Ctrl+G is taken by Object → Group; accept, and\n" +
+        "Edit > Keyboard Shortcuts > Menu Commands > File > Scripts > Subgroup > Group.\n" +
+        "Illustrator will warn that Ctrl+G is taken by Object > Group; accept, and\n" +
         "save the set. Clearing that assignment restores stock behavior entirely.",
         { multiline: true });
     hint.preferredSize = [400, 62];

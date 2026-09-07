@@ -22,6 +22,25 @@
 #define kSubgroupVersionCommas      1,0,0,0
 #define kSubgroupVersionString      "1.0.0"
 
+/* Wide flavors of the same text, for the Windows dialogs. The two-step
+   expansion is what makes the argument expand before L is pasted onto it.
+
+   The non-ASCII characters are escapes rather than literal glyphs so every
+   source file that uses them stays plain ASCII: this machine's code page is
+   932, and a literal em dash in a narrow or wide literal would be decoded
+   through whatever the compiler guessed the file's encoding was. Menu paths use
+   ">" rather than an arrow, which is the convention Adobe's own documentation
+   follows. */
+#define SG_WIDEN2(x)                L ## x
+#define SG_WIDEN(x)                 SG_WIDEN2(x)
+#define SG_WVERSION                 SG_WIDEN(kSubgroupVersionString)
+
+#define SG_EMDASH                   L"\x2014"   /* U+2014 em dash */
+#define SG_COPY                     L"\x00A9"   /* U+00A9 copyright sign */
+
+#define SG_REPO_URL                 L"https://github.com/VulpesNexus/illustrator-subgroup"
+#define SG_AUTHOR_URL               L"https://github.com/VulpesNexus"
+
 /* Persisted settings. AIPreferenceSuite takes a prefix and a suffix.
  *
  * Illustrator's preference getters cannot express "never written". Measured on
