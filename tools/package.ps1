@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Vixen420
+#
+# Assembles dist\Subgroup <version>\ and its .zip from tracked sources.
+#
+# The release used to be put together by hand, which meant the shipped
+# INSTALL.txt lived only in the ignored dist\ tree and could drift from the
+# repository without anything noticing. Everything the zip carries is now a
+# tracked file, and this script is the only thing that copies them.
+#
+#   powershell -File tools\package.ps1
+
+$ErrorActionPreference = 'Stop'
+$repo = Split-Path -Parent $PSScriptRoot
+
+$version = (Get-Content (Join-Path $repo 'VERSION') -Raw).Trim()
+if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "VERSION reads '$version'" }
+
+$aip = Join-Path $repo 'install\Subgroup.aip'
+if (-not (Test-Path $aip)) { throw "no binary at $aip -- build first" }
+
+# The one failure this script exists to make impossible: packaging a binary
+# from an earlier version because the rebuild was forgotten.
+$built = (Get-Item $aip).VersionInfo.FileVersion
+if ($built -ne $version) {
+    throw "install\Subgroup.aip is $built but VERSION says $version. Rebuild before packaging."
+}
+
+$stage = Join-Path $repo "dist\Subgroup $version"
+if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
+New-Item -ItemType Directory -Path (Join-Path $stage 'docs') -Force | Out-Null
+
+Copy-Item $aip (Join-Path $stage 'Subgroup.aip')
+Copy-Item (Join-Path $repo 'README.md')        $stage
+Copy-Item (Join-Path $repo 'LICENSE')          $stage
+Copy-Item (Join-Path $repo 'LICENSE-EXCEPTION') (Join-Path $stage 'LICENSE-EXCEPTION.txt')
+Copy-Item (Join-Path $repo 'docs\implementation-notes.md')     (Join-Path $stage 'docs')
+Copy-Item (Join-Path $repo 'docs\why-illustrator-declines.md') (Join-Path $stage 'docs')
+
+# INSTALL.txt carries the version in its first line, so it is a template. No
+# BOM: the file ships as plain text and some readers show one as a stray glyph.
+$install = [System.IO.File]::ReadAllText((Join-Path $repo 'packaging\INSTALL.txt'))
+$install = $install.Replace('{VERSION}', $version)
+$utf8 = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText((Join-Path $stage 'INSTALL.txt'), $install, $utf8)
+
+$zip = Join-Path $repo "dist\Subgroup $version.zip"
+if (Test-Path $zip) { Remove-Item $zip -Force }
+Compress-Archive -Path $stage -DestinationPath $zip -CompressionLevel Optimal
+
+Write-Output "Subgroup $version"
+Write-Output ("  {0}" -f $stage)
+Write-Output ("  {0}  {1} bytes" -f (Split-Path $zip -Leaf), (Get-Item $zip).Length)
+Write-Output ("  aip sha256 {0}" -f (Get-FileHash $aip).Hash)
+Write-Output ("  zip sha256 {0}" -f (Get-FileHash $zip).Hash)
+Write-Output "Attach the .zip to the tag as Subgroup-$version.zip."

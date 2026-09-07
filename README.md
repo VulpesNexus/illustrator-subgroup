@@ -71,6 +71,10 @@ loads into 30.7 — the v30 SDK from the Adobe Developer Console is required.
 *tools\AboutHarness\build.cmd* builds the About dialog as a standalone
 executable, which is the only way to look at it outside Illustrator.
 
+*tools\package.ps1* assembles the release zip from tracked files, taking the
+version from *VERSION* and refusing to run if *install\Subgroup.aip* was built
+from a different one.
+
 ## Limits
 
 - A click on nested art still resolves to the outermost group. This changes

@@ -1,0 +1,47 @@
+Subgroup {VERSION} — Adobe Illustrator plugin
+Windows x64. Built against the Illustrator 2026 SDK, tested on 30.7.
+
+INSTALL
+  1. Put Subgroup.aip in a folder of its own, anywhere you like.
+  2. Illustrator > Preferences > Plug-ins & Scratch Disks, and point
+     "Additional Plug-ins Folder" at that folder.
+  3. Restart Illustrator.
+
+  No admin rights are needed. Deleting the .aip uninstalls it. Replacing the
+  file needs Illustrator fully closed — it holds the plugin open while running.
+
+WHAT YOU GET
+  Object > Subgroup
+
+    Nest Down                  add a level of grouping INSIDE the selection,
+                               including when the selection is a whole group
+    Nest Up                    add a level AROUND it instead
+    Nest Whole Groups          on: Nest Down acts on a whole-group selection
+                               off: it declines, exactly as Object > Group does
+    Keep New Groups Open       leave a new group expanded in the Layers panel
+    Align Group To Selected ▸  select ONE object inside a group and its
+                               siblings move to meet it
+
+SHORTCUTS
+  All five commands are assignable under Edit > Keyboard Shortcuts… > Menu
+  Commands > Object > Subgroup, like any other menu command.
+
+  Nest Down is the one worth a key. Giving it Ctrl+G makes grouping simply start
+  working where Illustrator declines; Illustrator will warn that Ctrl+G belongs
+  to Object > Group, and accepting is safe — clearing the assignment restores
+  stock behavior completely.
+
+  The plugin never touches your keyboard set itself. Illustrator does not honor
+  a plugin's claim over a built-in's shortcut, and trying anyway rewrites your
+  saved set at every launch, so the choice stays yours.
+
+LICENSE
+  GNU General Public License, version 3 or later, with an Adobe Illustrator SDK
+  linking exception. Copyright © 2026 Vixen420.
+
+  The full text is in LICENSE and LICENSE-EXCEPTION, alongside this file. This
+  program comes with ABSOLUTELY NO WARRANTY.
+
+  The complete corresponding source is the repository this release was built
+  from, and the README there explains both the plugin and the measurements
+  behind it.
