@@ -36,11 +36,11 @@ Everything is under *Object > Subgroup*.
 Commands gray out when they do not apply. *Align Group To Selected* needs
 exactly one child of one group selected — a whole group singles out nothing, and
 picks spread across two groups are ambiguous. Partial selection counts, so the
-Direct Selection tool works.
+*Direct Selection* tool works.
 
 Ancestors of a new group are always re-expanded regardless of the toggle. Native
 grouping collapses the *topmost* ancestor rather than the new group, so artwork
-several levels down appears to vanish from the Layers panel.
+several levels down appears to vanish from the *Layers* panel.
 
 ### Shortcuts
 
@@ -68,7 +68,7 @@ msbuild plugin\Subgroup.vcxproj /p:Configuration=Release /p:Platform=x64 /p:AISD
 The SDK is version-gated per suite, so a CS6 SDK cannot produce a plugin that
 loads into 30.7 — the v30 SDK from the Adobe Developer Console is required.
 
-*tools\AboutHarness\build.cmd* builds the About dialog as a standalone
+*tools\AboutHarness\build.cmd* builds the *About* dialog as a standalone
 executable, which is the only way to look at it outside Illustrator.
 
 *tools\package.ps1* assembles the release zip from tracked files, taking the

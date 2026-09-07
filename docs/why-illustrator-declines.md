@@ -82,7 +82,7 @@ group selected directly           : selection = len=1 [GroupItem]   children .se
 
 Indistinguishable. Every readable property is identical. And from that hand-made
 state, *Horizontal Align Left* moved nothing at all — both objects' bounds were
-byte-identical before and after — while the Group command produced no nesting.
+byte-identical before and after — while the *Group* command produced no nesting.
 
 The circle drives **appearance targeting**, a channel parallel to selection, and
 it has no scripting surface whatsoever: reflecting over `PathItem`, `GroupItem`,
@@ -129,7 +129,7 @@ every direct-manipulation operation — drag, scale, rotate, delete, or transfor
 — "all children selected" and "the group selected" mean precisely the same thing
 and produce precisely the same result. Keeping two distinct internal
 representations of an identical manipulation state would need an answer for what
-the bounding box and handles look like, what the Appearance panel targets, what
+the bounding box and handles look like, what the *Appearance* panel targets, what
 *Ctrl+G* means, and what *Ctrl+Shift+G* means, in each of them. Collapsing to the
 group removes the ambiguity at the cost of making one state unrepresentable.
 

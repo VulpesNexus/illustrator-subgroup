@@ -136,7 +136,7 @@ failing in the hand.
 
 ---
 
-## Looking at the About dialog
+## Looking at the *About* dialog
 
 A modal dialog inside a host application is close to untestable: you cannot
 drive it, screenshot it, or measure it without a person sitting in front of it.
