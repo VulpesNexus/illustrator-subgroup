@@ -5,12 +5,12 @@ These *do* rebind *Ctrl+G*; [the plugin](../README.md) avoids that.
 
 Two commands and a settings dialog, sharing one persistent store.
 
-## *Group.jsx* — the augmented Ctrl+G
+## *Group.jsx* — the augmented *Ctrl+G*
 
 Assign *Ctrl+G* to this and grouping starts working where Illustrator declines.
 
 It is built around one rule: **Illustrator gets first refusal.** The script calls
-the native Group command first and watches whether a probe item was reparented.
+the native *Group* command first and watches whether a probe item was reparented.
 If it was, the script returns immediately — so every case that already worked is
 not an imitation of vanilla behavior, it *is* vanilla behavior. Only after
 watching the native command decline does it step in.
@@ -48,7 +48,7 @@ Clicking a row highlights that object on the canvas, which is the only practical
 way to tell two unnamed paths apart. An ordinary selection of two or more objects
 works too.
 
-Six alignments, with a *Use preview bounds* checkbox mirroring the Align panel's
+Six alignments, with a *Use preview bounds* checkbox mirroring the *Align* panel's
 option. The dialog stays open so a horizontal and a vertical alignment can be
 applied in one go.
 
