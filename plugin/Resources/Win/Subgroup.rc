@@ -1,0 +1,87 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Vixen420
+//
+// Subgroup is free software: you may redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version. It comes with ABSOLUTELY NO WARRANTY. See the file LICENSE, or
+// <https://www.gnu.org/licenses/>, for the full text.
+//
+// Additional permission under GPL-3.0 section 7: this file may be combined with
+// the Adobe Illustrator SDK, whose sample framework sources are compiled into
+// every plug-in built from it. See LICENSE-EXCEPTION.
+
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+#include "SubgroupID.h"
+/* winres.h rather than the sample's afxres.h: afxres.h ships with MFC, which a
+   default Visual Studio C++ install does not include. winres.h is part of the
+   Windows SDK and provides everything a plug-in resource script needs. */
+#include "winres.h"
+#undef APSTUDIO_READONLY_SYMBOLS
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif
+
+#define kMySDKPluginName kSubgroupPluginName
+#define PIPL_PLUGIN_NAME kMySDKPluginName
+
+/////////////////////////////////////////////////////////////////////////////
+// VersionInfo
+//
+// Written out here rather than including the SDK's samplecode/common/win/
+// VersionInfo.rc. That file hard-codes CompanyName, ProductName, and
+// LegalCopyright to Adobe's, with no way to override them, so every sample
+// built from it ships claiming Adobe published it. Fine for a sample that
+// never leaves the SDK tree; not fine for a plug-in anyone else installs.
+//
+// Put your own name in LegalCopyright and CompanyName if you fork this.
+//
+// Strings are plain ASCII on purpose: this file is compiled as code page 1252,
+// so anything outside it would need the file's encoding changed to match.
+
+// kSubgroupVersionCommas and kSubgroupVersionString come from SubgroupID.h,
+// included above, so the resource and the About box cannot disagree.
+
+1 VERSIONINFO
+ FILEVERSION kSubgroupVersionCommas
+ PRODUCTVERSION kSubgroupVersionCommas
+ FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+ FILEFLAGS VS_FF_DEBUG
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS VOS__WINDOWS32
+ FILETYPE VFT_DLL
+ FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4" // Lang=US English, CharSet=Windows Multilingual
+        BEGIN
+            VALUE "CompanyName",      "Subgroup", "\0"
+            VALUE "FileDescription",  "Subgroup plug-in for Adobe Illustrator", "\0"
+            VALUE "FileVersion",      kSubgroupVersionString, "\0"
+            VALUE "InternalName",     kMySDKPluginName, "\0"
+            VALUE "LegalCopyright",   "Copyright (C) 2026 Vixen420. GPL-3.0-or-later, with an Adobe Illustrator SDK linking exception.", "\0"
+            VALUE "OriginalFilename", kMySDKPluginName ".aip", "\0"
+            VALUE "ProductName",      "Subgroup", "\0"
+            VALUE "ProductVersion",   kSubgroupVersionString, "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 0x04E4
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// PIPL - generated into the project directory by the pre-build step
+plugin pipl "plugin.pipl"
+
+#endif

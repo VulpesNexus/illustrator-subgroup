@@ -1,0 +1,24 @@
+# Build output
+plugin/output/
+plugin/*.exp
+plugin/*.lib
+plugin/*.pdb
+
+# Generated at build time by tools/pipl/create_pipl.py
+plugin/plugin.pipl
+
+# Machine-local SDK location. See "Build" in README.md.
+plugin/AISDK.props
+
+# Visual Studio
+.vs/
+*.user
+*.bak
+
+# Packaged releases, staged here to be attached to a tag. The shipped binary
+# itself is tracked in install/.
+dist/
+
+# Binary parked aside because Illustrator had it open; safe to delete once
+# Illustrator has been restarted.
+*.inuse

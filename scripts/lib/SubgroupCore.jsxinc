@@ -1,0 +1,184 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Vixen420
+//
+// Subgroup is free software: you may redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version. It comes with ABSOLUTELY NO WARRANTY. See the file LICENSE, or
+// <https://www.gnu.org/licenses/>, for the full text.
+
+/*
+ * SubgroupCore.jsxinc — shared logic for the Subgroup scripts.
+ *
+ * Everything here works on the Illustrator DOM directly. It never calls the
+ * Group menu command, so the selection canonicalization that blocks Ctrl+G
+ * (see README) does not apply.
+ *
+ * Bounds convention, measured on Illustrator 30.7:
+ *   geometricBounds / visibleBounds = [left, top, right, bottom]
+ *   y increases upward, so top > bottom
+ *   translate(dx, dy) uses the same signs: positive dy moves up
+ *   PLACEAFTER puts an item immediately BELOW the reference in z-order
+ *   layer.pageItems and groupItem.pageItems are direct children only,
+ *   index 0 being the topmost
+ */
+
+/* Set true by anything standing in for a native keystroke. A reflex press of
+   Ctrl+G must never raise a dialog — vanilla Illustrator fails silently when
+   it cannot group, and a stand-in that nags would be worse than the problem
+   it solves. */
+var SG_QUIET = false;
+
+function sgAlert(msg) {
+    if (SG_QUIET) return;
+    alert("Subgroup\n\n" + msg);
+}
+
+function sgIsGroup(item) {
+    return item && item.typename === "GroupItem";
+}
+
+/* Direct children of a layer or group, topmost first, as a plain array
+   so the snapshot survives the reparenting we are about to do. */
+function sgChildren(container) {
+    var out = [];
+    for (var i = 0; i < container.pageItems.length; i++) {
+        out.push(container.pageItems[i]);
+    }
+    return out;
+}
+
+function sgIndexOf(parent, item) {
+    var kids = parent.pageItems;
+    for (var i = 0; i < kids.length; i++) {
+        if (kids[i] === item) return i;
+    }
+    return -1;
+}
+
+/* Illustrator throws on move/translate of locked or hidden art, and on art
+   inside a locked or hidden layer. Report that up front rather than dying
+   half way through and leaving a partly built group behind. */
+function sgBlockedReason(item) {
+    if (item.locked) return "'" + sgLabel(item) + "' is locked.";
+    if (item.hidden) return "'" + sgLabel(item) + "' is hidden.";
+    var p = item.parent;
+    while (p) {
+        if (p.typename === "Layer") {
+            if (p.locked) return "Layer '" + p.name + "' is locked.";
+            if (!p.visible) return "Layer '" + p.name + "' is hidden.";
+            break;
+        }
+        if (p.locked) return "A parent group of '" + sgLabel(item) + "' is locked.";
+        if (p.hidden) return "A parent group of '" + sgLabel(item) + "' is hidden.";
+        p = p.parent;
+    }
+    return null;
+}
+
+function sgCheckAll(items) {
+    for (var i = 0; i < items.length; i++) {
+        var why = sgBlockedReason(items[i]);
+        if (why) return why;
+    }
+    return null;
+}
+
+/* A human-readable handle for an item that usually has no name. */
+function sgLabel(item) {
+    if (item.name) return item.name;
+    var b;
+    try { b = item.geometricBounds; } catch (e) { return item.typename; }
+    var w = Math.round(Math.abs(b[2] - b[0]));
+    var h = Math.round(Math.abs(b[1] - b[3]));
+    var kind = item.typename.replace(/Item$/, "");
+    if (sgIsGroup(item)) kind += " of " + item.pageItems.length;
+    return kind + "  " + w + " × " + h + " pt";
+}
+
+function sgAllShareParent(items) {
+    var p = items[0].parent;
+    for (var i = 1; i < items.length; i++) {
+        if (items[i].parent !== p) return null;
+    }
+    return p;
+}
+
+/*
+ * Add one level ABOVE the given items: a new group in their common parent,
+ * containing them.
+ *
+ * Reproduces what Ctrl+G does when it agrees to run, as measured: the new
+ * group takes the z-position of the topmost selected item, and the members
+ * keep their relative order. The difference is that this runs for any
+ * number of items, including a selection that is the whole of a group.
+ */
+function sgWrap(items) {
+    var parent = sgAllShareParent(items);
+    if (!parent) {
+        sgAlert("Those objects live in different groups or layers.\n" +
+                "Select art from one container at a time.");
+        return null;
+    }
+
+    /* Record positions before anything moves. The topmost selected index is
+       the minimum, so by definition nothing selected sits above it and the
+       reference sibling is simply the item one step up. */
+    var ordered = [];
+    for (var i = 0; i < items.length; i++) {
+        ordered.push({ item: items[i], idx: sgIndexOf(parent, items[i]) });
+    }
+    ordered.sort(function (a, b) { return a.idx - b.idx; });
+
+    var topIdx = ordered[0].idx;
+    var ref = topIdx > 0 ? parent.pageItems[topIdx - 1] : null;
+
+    var grp = parent.groupItems.add();
+    for (var j = 0; j < ordered.length; j++) {
+        ordered[j].item.move(grp, ElementPlacement.PLACEATEND);
+    }
+    if (ref) grp.move(ref, ElementPlacement.PLACEAFTER);
+
+    return grp;
+}
+
+/*
+ * Add one level BELOW a group: a new group inside it holding everything it
+ * currently contains. This is the operation Ctrl+G cannot express at all,
+ * because reaching the state that would trigger it — every child selected
+ * as individuals — is not representable in Illustrator's selection model.
+ */
+function sgNestContents(grp) {
+    var kids = sgChildren(grp);
+    if (kids.length === 0) {
+        sgAlert("That group is empty, so there is nothing to nest.");
+        return null;
+    }
+    var why = sgCheckAll(kids);
+    if (why) { sgAlert("Cannot nest:\n" + why); return null; }
+
+    var inner = grp.groupItems.add();
+    for (var i = 0; i < kids.length; i++) {
+        kids[i].move(inner, ElementPlacement.PLACEATEND);
+    }
+    return inner;
+}
+
+function sgActiveDoc() {
+    if (app.documents.length === 0) {
+        sgAlert("Open a document first.");
+        return null;
+    }
+    return app.activeDocument;
+}
+
+function sgSelectionArray() {
+    var sel = app.selection;
+    if (!sel || sel.length === 0) return [];
+    var out = [];
+    for (var i = 0; i < sel.length; i++) {
+        /* Text insertion points show up in selection as non-page-items. */
+        if (sel[i].typename) out.push(sel[i]);
+    }
+    return out;
+}

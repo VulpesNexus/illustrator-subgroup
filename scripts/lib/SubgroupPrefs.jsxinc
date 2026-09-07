@@ -1,0 +1,51 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Vixen420
+//
+// Subgroup is free software: you may redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version. It comes with ABSOLUTELY NO WARRANTY. See the file LICENSE, or
+// <https://www.gnu.org/licenses/>, for the full text.
+
+/*
+ * SubgroupPrefs.jsxinc — persistent settings.
+ *
+ * app.preferences survives restarts, which is what makes a toggle a toggle
+ * rather than a per-session mood.
+ *
+ * Only STRING preferences are usable here. Measured on Illustrator 30.7, a key
+ * that was never written reads back as:
+ *
+ *     getBooleanPreference  -> true      (!)
+ *     getIntegerPreference  -> 1         (!)
+ *     getStringPreference   -> ""        <- the only usable "unset" sentinel
+ *
+ * A boolean-backed toggle would therefore default to ON and give no way to
+ * distinguish "the user turned it on" from "nobody ever set this", so the
+ * built-in defaults below are stored as "1"/"0" strings instead.
+ */
+
+var SG_PREF_NESTING   = "Subgroup/augmentedNesting";
+var SG_PREF_GROUPMODE = "Subgroup/wholeGroupMode";   /* "nest" | "wrap" */
+
+function sgPrefBool(key, dflt) {
+    var v;
+    try { v = app.preferences.getStringPreference(key); } catch (e) { return dflt; }
+    if (v === "1") return true;
+    if (v === "0") return false;
+    return dflt;
+}
+
+function sgPrefSetBool(key, val) {
+    try { app.preferences.setStringPreference(key, val ? "1" : "0"); } catch (e) {}
+}
+
+function sgPrefStr(key, dflt) {
+    var v;
+    try { v = app.preferences.getStringPreference(key); } catch (e) { return dflt; }
+    return (v === "" || v === null) ? dflt : v;
+}
+
+function sgPrefSetStr(key, val) {
+    try { app.preferences.setStringPreference(key, String(val)); } catch (e) {}
+}
