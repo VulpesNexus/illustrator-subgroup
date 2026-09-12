@@ -38,7 +38,7 @@
 #define SG_EMDASH                   L"\x2014"   /* U+2014 em dash */
 #define SG_COPY                     L"\x00A9"   /* U+00A9 copyright sign */
 
-#define SG_REPO_URL                 L"https://github.com/VulpesNexus/illustrator-subgroup"
+#define SG_REPO_URL                 L"https://github.com/VulpesNexus/subgroup"
 #define SG_AUTHOR_URL               L"https://github.com/VulpesNexus"
 
 /* Persisted settings. AIPreferenceSuite takes a prefix and a suffix.
