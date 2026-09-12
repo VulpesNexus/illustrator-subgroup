@@ -19,8 +19,8 @@
 /* One place for the version. Subgroup.rc builds the Windows VERSIONINFO
    resource out of both of these, and the About box shows the string. Keep them
    in step with the VERSION file at the root of the repository. */
-#define kSubgroupVersionCommas      1,0,1,0
-#define kSubgroupVersionString      "1.0.1"
+#define kSubgroupVersionCommas      1,0,2,0
+#define kSubgroupVersionString      "1.0.2"
 
 /* Wide flavors of the same text, for the Windows dialogs. The two-step
    expansion is what makes the argument expand before L is pasted onto it.
